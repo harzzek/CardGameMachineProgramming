@@ -4,5 +4,7 @@
 
 #ifndef CARDGAMEMACHINEPROGRAMMING_FUNKTIONS_H
 #define CARDGAMEMACHINEPROGRAMMING_FUNKTIONS_H
-int loadCards(void);
+typedef struct Card;
+int createDeck();
+void swap( struct Card *a, struct Card *b);
 #endif //CARDGAMEMACHINEPROGRAMMING_FUNKTIONS_H
