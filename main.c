@@ -5,23 +5,29 @@
 #define CRDS 52
 #include <time.h>
 
-
-int counter = 0;
-
 typedef struct Card{
     char data[2];
     struct Card* next;
+    struct Card* previous;
 } Card;
 
 Card cards[CRDS];
 
-Card c1;
-Card c2;
-Card c3;
-Card c4;
-Card c5;
-Card c6;
-Card c7;
+struct Card* c1Head = NULL;
+struct Card* c2Head = NULL;
+struct Card* c3Head = NULL;
+struct Card* c4Head = NULL;
+struct Card* c5Head = NULL;
+struct Card* c6Head = NULL;
+struct Card* c7Head = NULL;
+
+struct Card* c1Tail = NULL;
+struct Card* c2Tail = NULL;
+struct Card* c3Tail = NULL;
+struct Card* c4Tail = NULL;
+struct Card* c5Tail = NULL;
+struct Card* c6Tail = NULL;
+struct Card* c7Tail = NULL;
 
 int createDeck();
 void shuffle(Card *deck, int n);
@@ -31,18 +37,39 @@ int main() {
     shuffle(cards,CRDS);
     shuffle(cards,CRDS);
 
-    int i;
-    for (i = 0; i < CRDS; i++){
+    for (int i = 0; i < CRDS; i++){
         printf("%c",cards[i].data[0]);
         printf("%c\n",cards[i].data[1]);
     }
     return 0;
 }
 
-void addCard(char value, char type)
+void addCard(int counter,char value, char type)
 {
     cards[counter].data[0] = value;
     cards[counter].data[1] = type;
+}
+
+void push(Card* headOfLink, Card* tailOfLink, Card* cardToImport)
+{
+    if(headOfLink != NULL)
+    {
+        struct Card* newCard = malloc(sizeof(struct Card));
+        newCard->next = NULL;
+        newCard->previous = tailOfLink;
+        newCard->data[0] = &cardToImport[0];
+        newCard->data[1] = &cardToImport[1];
+        tailOfLink->next = newCard;
+        tailOfLink = newCard;
+    } else
+        {
+            headOfLink = malloc(sizeof (struct Card));
+            headOfLink->previous = NULL;
+            headOfLink->next = NULL;
+            headOfLink->data[0] = &cardToImport[0];
+            headOfLink->data[1] = &cardToImport[1];
+            tailOfLink = headOfLink;
+        }
 }
 
 int createDeck()
@@ -50,8 +77,10 @@ int createDeck()
     char line[CRDS];
     FILE * fpointer = fopen("..\\Cards.txt","r");
 
+    int counter = 0;
     while (fgets(line, CRDS, fpointer) != NULL) {
-        addCard(line[0],line[1]);
+        //printf("%c %c\n",line[0], line[1]);
+        addCard(counter,line[0],line[1]);
         counter++;
     }
 
@@ -74,21 +103,4 @@ void shuffle(Card *deck, int n) //Shuffles array
         int j = rand() % (i+1);
         swap(&deck[i], &deck[j]);
     }
-}
-
-void createColumns() {
-    c1 = cards[0];
-    c2 = cards[1];
-    c3 = cards[2];
-    c4 = cards[3];
-    c5 = cards[4];
-    c6 = cards[5];
-    c7 = cards[6];
-    
-    int i = 7;
-    while(i < CRDS)
-    {
-
-    }
-    
 }
