@@ -32,16 +32,24 @@ struct Card* c7Tail = NULL;
 int createDeck();
 void shuffle(Card *deck, int n);
 void push(Card* headOfLink, Card* tailOfLink, Card* cardToImport);
+void createColumns();
+void printColumn(Card *head);
 
 int main() {
     createDeck();
     shuffle(cards,CRDS);
     shuffle(cards,CRDS);
+    createColumns();
+    printColumn(c2Head);
 
+
+/*
     for (int i = 0; i < CRDS; i++){
-        printf("%c",cards[i].data[0]);
+
+        printf("%c", cards[i].data[0]);
         printf("%c\n",cards[i].data[1]);
     }
+    */
     return 0;
 }
 
@@ -58,7 +66,7 @@ void push(Card* headOfLink, Card* tailOfLink, Card* cardToImport)
         struct Card* newCard = malloc(sizeof(struct Card));
         newCard->next = NULL;
         newCard->previous = tailOfLink;
-        newCard->data[0] = &cardToImport[0];
+        newCard->data[0] =  &cardToImport[0];
         newCard->data[1] = &cardToImport[1];
         tailOfLink->next = newCard;
         tailOfLink = newCard;
@@ -119,16 +127,38 @@ void createColumns()
             if(i = 4) push(c5Head, c5Tail, &cards[i]);
             if(i = 5) push(c6Head, c6Tail, &cards[i]);
             if(i = 6) push(c7Head, c7Tail, &cards[i]);
-        } else if(i > 13)
+        } else if(i > 12)
         {
             push(c2Head, c2Tail, &cards[i]);
-        } else if(i > 20)
+        } else if(i > 18)
         {
             push(c3Head, c3Tail, &cards[i]);
-        } else if(i > 28)
+        } else if(i > 25)
         {
             push(c4Head, c4Tail, &cards[i]);
-        } else if()
+        } else if(i > 33)
+        {
+            push(c5Head, c5Tail, &cards[i]);
+        } else if (i > 42)
+        {
+            push(c6Head, c6Tail, &cards[i]);
+        } else if (i > 52)
+        {
+            push(c7Head, c7Tail, &cards[i]);
+        }
     }
+}
+
+void printColumn(Card *head)
+{
+    printf("%c", &head->data[0]);
+    printf("%c\n", &head->data[1]);
+
+    while(head->next != NULL){
+        head = head->next;
+        printf("%c", &head->data[0]);
+        printf("%c\n", &head->data[1]);
+    }
+
 }
 
