@@ -31,6 +31,7 @@ struct Card* c7Tail = NULL;
 
 int createDeck();
 void shuffle(Card *deck, int n);
+void push(Card* headOfLink, Card* tailOfLink, Card* cardToImport);
 
 int main() {
     createDeck();
@@ -104,3 +105,30 @@ void shuffle(Card *deck, int n) //Shuffles array
         swap(&deck[i], &deck[j]);
     }
 }
+
+void createColumns()
+{
+    for(int i = 0; i < CRDS; i++)
+    {
+        if(i > 7)
+        {
+            if(i = 0) push(c1Head, c1Tail, &cards[i]);
+            if(i = 1) push(c2Head, c2Tail, &cards[i]);
+            if(i = 2) push(c3Head, c3Tail, &cards[i]);
+            if(i = 3) push(c4Head, c4Tail, &cards[i]);
+            if(i = 4) push(c5Head, c5Tail, &cards[i]);
+            if(i = 5) push(c6Head, c6Tail, &cards[i]);
+            if(i = 6) push(c7Head, c7Tail, &cards[i]);
+        } else if(i > 13)
+        {
+            push(c2Head, c2Tail, &cards[i]);
+        } else if(i > 20)
+        {
+            push(c3Head, c3Tail, &cards[i]);
+        } else if(i > 28)
+        {
+            push(c4Head, c4Tail, &cards[i]);
+        } else if()
+    }
+}
+
