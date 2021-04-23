@@ -31,7 +31,7 @@ struct Card* c7Tail = NULL;
 
 int createDeck();
 void shuffle(Card *deck, int n);
-void push(Card* headOfLink, Card* tailOfLink, Card* cardToImport);
+void push(Card** headOfLink, Card** tailOfLink, Card* cardToImport);
 void createColumns();
 void printColumn(Card *head);
 
@@ -40,7 +40,7 @@ int main() {
     shuffle(cards,CRDS);
     shuffle(cards,CRDS);
     createColumns();
-    printColumn(c2Head);
+    printColumn(c4Head);
 
 
 /*
@@ -59,25 +59,25 @@ void addCard(int counter,char value, char type)
     cards[counter].data[1] = type;
 }
 
-void push(Card* headOfLink, Card* tailOfLink, Card* cardToImport)
+void push(Card** headOfLink, Card** tailOfLink, Card* cardToImport)
 {
-    if(headOfLink != NULL)
+    if(*headOfLink != NULL)
     {
         struct Card* newCard = malloc(sizeof(struct Card));
         newCard->next = NULL;
-        newCard->previous = tailOfLink;
-        newCard->data[0] =  &cardToImport[0];
-        newCard->data[1] = &cardToImport[1];
-        tailOfLink->next = newCard;
-        tailOfLink = newCard;
+        newCard->previous = *tailOfLink;
+        newCard->data[0] = cardToImport->data[0];
+        newCard->data[1] = cardToImport->data[1];
+        (**tailOfLink).next = newCard;
+        *tailOfLink = newCard;
     } else
         {
-            headOfLink = malloc(sizeof (struct Card));
-            headOfLink->previous = NULL;
-            headOfLink->next = NULL;
-            headOfLink->data[0] = &cardToImport[0];
-            headOfLink->data[1] = &cardToImport[1];
-            tailOfLink = headOfLink;
+            *headOfLink = malloc(sizeof(struct Card));
+            (*headOfLink)->previous = NULL;
+            (*headOfLink)->next = NULL;
+            (*headOfLink)->data[0] = cardToImport->data[0];
+            (*headOfLink)->data[1] = cardToImport->data[1];
+            *tailOfLink = *headOfLink;
         }
 }
 
@@ -118,46 +118,46 @@ void createColumns()
 {
     for(int i = 0; i < CRDS; i++)
     {
-        if(i > 7)
+        if(i < 7)
         {
-            if(i = 0) push(c1Head, c1Tail, &cards[i]);
-            if(i = 1) push(c2Head, c2Tail, &cards[i]);
-            if(i = 2) push(c3Head, c3Tail, &cards[i]);
-            if(i = 3) push(c4Head, c4Tail, &cards[i]);
-            if(i = 4) push(c5Head, c5Tail, &cards[i]);
-            if(i = 5) push(c6Head, c6Tail, &cards[i]);
-            if(i = 6) push(c7Head, c7Tail, &cards[i]);
-        } else if(i > 12)
+            if(i == 0) push(&c1Head, &c1Tail, &cards[i]);
+            if(i == 1) push(&c2Head, &c2Tail, &cards[i]);
+            if(i == 2) push(&c3Head, &c3Tail, &cards[i]);
+            if(i == 3) push(&c4Head, &c4Tail, &cards[i]);
+            if(i == 4) push(&c5Head, &c5Tail, &cards[i]);
+            if(i == 5) push(&c6Head, &c6Tail, &cards[i]);
+            if(i == 6) push(&c7Head, &c7Tail, &cards[i]);
+        } else if(i < 12)
         {
-            push(c2Head, c2Tail, &cards[i]);
-        } else if(i > 18)
+            push(&c2Head, &c2Tail, &cards[i]);
+        } else if(i < 18)
         {
-            push(c3Head, c3Tail, &cards[i]);
-        } else if(i > 25)
+            push(&c3Head, &c3Tail, &cards[i]);
+        } else if(i < 25)
         {
-            push(c4Head, c4Tail, &cards[i]);
-        } else if(i > 33)
+            push(&c4Head, &c4Tail, &cards[i]);
+        } else if(i < 33)
         {
-            push(c5Head, c5Tail, &cards[i]);
-        } else if (i > 42)
+            push(&c5Head, &c5Tail, &cards[i]);
+        } else if (i < 42)
         {
-            push(c6Head, c6Tail, &cards[i]);
-        } else if (i > 52)
+            push(&c6Head, &c6Tail, &cards[i]);
+        } else if (i < 52)
         {
-            push(c7Head, c7Tail, &cards[i]);
+            push(&c7Head, &c7Tail, &cards[i]);
         }
     }
 }
 
 void printColumn(Card *head)
 {
-    printf("%c", &head->data[0]);
-    printf("%c\n", &head->data[1]);
+    printf("%c", head->data[0]);
+    printf("%c\n", head->data[1]);
 
     while(head->next != NULL){
         head = head->next;
-        printf("%c", &head->data[0]);
-        printf("%c\n", &head->data[1]);
+        printf("%c", head->data[0]);
+        printf("%c\n", head->data[1]);
     }
 
 }
