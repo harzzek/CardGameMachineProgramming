@@ -4,9 +4,11 @@
 #include <string.h>
 #define CRDS 52
 #include <time.h>
+#include<stdbool.h>
 
 typedef struct Card{
     char data[2];
+    bool visible;
     struct Card* next;
     struct Card* previous;
 } Card;
@@ -168,6 +170,18 @@ void createColumns()
     }
 }
 
+void makeColumnInvisible(Card* columnHead, int numOfInvisible)
+{
+    Card* card = columnHead;
+
+    for(int i = 0; i < numOfInvisible; i++)
+    {
+        card->visible = false;
+        if(card->next != NULL) card = card->next;
+        else break;
+    }
+}
+
 void printColumn(Card *head)
 {
     printf("%c", head->data[0]);
@@ -228,7 +242,6 @@ void display() {
                head5->data[0], head5->data[1],
                head6->data[0], head6->data[1],
                head7->data[0], head7->data[1]);
-        head3 = head3->next;
         head4 = head4->next;
         head5 = head5->next;
         head6 = head6->next;
@@ -239,7 +252,6 @@ void display() {
            head5->data[0], head5->data[1],
            head6->data[0], head6->data[1],
            head7->data[0], head7->data[1]);
-    head4 = head4->next;
     head5 = head5->next;
     head6 = head6->next;
     head7 = head7->next;
@@ -248,19 +260,16 @@ void display() {
            head5->data[0], head5->data[1],
            head6->data[0], head6->data[1],
            head7->data[0], head7->data[1]);
-    head5 = head5->next;
     head6 = head6->next;
     head7 = head7->next;
 
     printf("\t\t\t\t\t%c%c\t%c%c\n",
            head6->data[0], head6->data[1],
            head7->data[0], head7->data[1]);
-    head6 = head6->next;
     head7 = head7->next;
 
     printf("\t\t\t\t\t\t%c%c\n",
            head7->data[0], head7->data[1]);
-    head7 = head7->next;
 
 
 
@@ -301,3 +310,13 @@ void display() {
         head7 = head7->next;
     }
      */
+void quitProgram()
+{
+    exit(1);
+}
+
+void startPhase()
+{
+    createDeck();
+}
+
