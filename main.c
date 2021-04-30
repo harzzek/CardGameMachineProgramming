@@ -4,9 +4,11 @@
 #include <string.h>
 #define CRDS 52
 #include <time.h>
+#include<stdbool.h>
 
 typedef struct Card{
     char data[2];
+    bool visible;
     struct Card* next;
     struct Card* previous;
 } Card;
@@ -165,6 +167,18 @@ void createColumns()
     }
 }
 
+void makeColumnInvisible(Card* columnHead, int numOfInvisible)
+{
+    Card* card = columnHead;
+
+    for(int i = 0; i < numOfInvisible; i++)
+    {
+        card->visible = false;
+        if(card->next != NULL) card = card->next;
+        else break;
+    }
+}
+
 void printColumn(Card *head)
 {
     printf("%c", head->data[0]);
@@ -176,5 +190,15 @@ void printColumn(Card *head)
         printf("%c\n", head->data[1]);
     }
 
+}
+
+void quitProgram()
+{
+    exit(1);
+}
+
+void startPhase()
+{
+    createDeck();
 }
 
