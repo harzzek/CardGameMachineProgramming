@@ -42,6 +42,22 @@ int main() {
     createColumns();
     printColumn(c4Head);
 
+    char command[2] = "SW";
+
+    scanf("%s",command);
+
+    switch(command[0] + command[1]){
+        case 'S'+'W':
+            printf("%c%c", command[0], command[1]);
+            break;
+        case 'L'+'D':
+            printf("%c%c", command[0], command[1]);
+            break;
+        default:
+            break;
+
+    }
+
 
 /*
     for (int i = 0; i < CRDS; i++){
