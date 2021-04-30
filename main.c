@@ -36,13 +36,16 @@ void shuffle(Card *deck, int n);
 void push(Card** headOfLink, Card** tailOfLink, Card* cardToImport);
 void createColumns();
 void printColumn(Card *head);
+void display();
 
 int main() {
     createDeck();
     shuffle(cards,CRDS);
     shuffle(cards,CRDS);
     createColumns();
-    printColumn(c4Head);
+
+    display();
+    //printColumn(c4Head);
 
     char command[2] = "SW";
 
@@ -192,6 +195,121 @@ void printColumn(Card *head)
 
 }
 
+
+void display() {
+    Card *head1 = c1Head;
+    Card *head2 = c2Head;
+    Card *head3 = c3Head;
+    Card *head4 = c4Head;
+    Card *head5 = c5Head;
+    Card *head6 = c6Head;
+    Card *head7 = c7Head;
+
+    printf("%c%c\t%c%c\t%c%c\t%c%c\t%c%c\t%c%c\t%c%c\n",
+           head1->data[0], head1->data[1],
+           head2->data[0], head2->data[1],
+           head3->data[0], head3->data[1],
+           head4->data[0], head4->data[1],
+           head5->data[0], head5->data[1],
+           head6->data[0], head6->data[1],
+           head7->data[0], head7->data[1]);
+    head2 = head2->next;
+    head3 = head3->next;
+    head4 = head4->next;
+    head5 = head5->next;
+    head6 = head6->next;
+    head7 = head7->next;
+
+    for(int i = 1; i < 6; i++) {
+        printf("\t%c%c\t%c%c\t%c%c\t%c%c\t%c%c\t%c%c\n",
+               head2->data[0], head2->data[1],
+               head3->data[0], head3->data[1],
+               head4->data[0], head4->data[1],
+               head5->data[0], head5->data[1],
+               head6->data[0], head6->data[1],
+               head7->data[0], head7->data[1]);
+        head2 = head2->next;
+        head3 = head3->next;
+        head4 = head4->next;
+        head5 = head5->next;
+        head6 = head6->next;
+        head7 = head7->next;
+    }
+
+        printf("\t\t%c%c\t%c%c\t%c%c\t%c%c\t%c%c\n",
+               head3->data[0], head3->data[1],
+               head4->data[0], head4->data[1],
+               head5->data[0], head5->data[1],
+               head6->data[0], head6->data[1],
+               head7->data[0], head7->data[1]);
+        head4 = head4->next;
+        head5 = head5->next;
+        head6 = head6->next;
+        head7 = head7->next;
+
+    printf("\t\t\t%c%c\t%c%c\t%c%c\t%c%c\n",
+           head4->data[0], head4->data[1],
+           head5->data[0], head5->data[1],
+           head6->data[0], head6->data[1],
+           head7->data[0], head7->data[1]);
+    head5 = head5->next;
+    head6 = head6->next;
+    head7 = head7->next;
+
+    printf("\t\t\t\t%c%c\t%c%c\t%c%c\n",
+           head5->data[0], head5->data[1],
+           head6->data[0], head6->data[1],
+           head7->data[0], head7->data[1]);
+    head6 = head6->next;
+    head7 = head7->next;
+
+    printf("\t\t\t\t\t%c%c\t%c%c\n",
+           head6->data[0], head6->data[1],
+           head7->data[0], head7->data[1]);
+    head7 = head7->next;
+
+    printf("\t\t\t\t\t\t%c%c\n",
+           head7->data[0], head7->data[1]);
+
+
+
+
+
+}
+
+
+    /*
+
+    for(int i = 1; i < 11; i++) {
+        if (head1 != NULL)
+            printf("%c%c\t", head1->data[0], head1->data[1]);
+        else printf("\t");
+        if (head2 != NULL)
+            printf("%c%c\t", head2->data[0], head2->data[1]);
+        else printf("\t");
+        if (head3 != NULL)
+            printf("%c%c\t", head3->data[0], head3->data[1]);
+        else printf("\t");
+        if (head4 != NULL)
+            printf("%c%c\t", head4->data[0], head4->data[1]);
+        else printf("\t");
+        if (head5 != NULL)
+            printf("%c%c\t", head5->data[0], head5->data[1]);
+        else printf("\t");
+        if (head6 != NULL)
+            printf("%c%c\t", head6->data[0], head6->data[1]);
+        else printf("\t");
+        if (head7 != NULL)
+            printf("%c%c\n", head7->data[0], head7->data[1]);
+        head1 = head1->next;
+        head2 = head2->next;
+        head3 = head3->next;
+        head4 = head4->next;
+        head5 = head5->next;
+        head6 = head6->next;
+        head7 = head7->next;
+    }
+     */
 void quitProgram()
 {
     exit(1);
