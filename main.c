@@ -1,13 +1,13 @@
 #include "funktions.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #define CRDS 52
 #include <time.h>
-#include<stdbool.h>
+#include <stdbool.h>
+#include <string.h>
 
 typedef struct Card{
-    char data[2];
+    char data[3];
     bool visible;
     struct Card* next;
     struct Card* previous;
@@ -23,6 +23,11 @@ struct Card* c5Head = NULL;
 struct Card* c6Head = NULL;
 struct Card* c7Head = NULL;
 
+struct Card* f1tail = NULL;
+struct Card* f2tail = NULL;
+struct Card* f3tail = NULL;
+struct Card* f4tail = NULL;
+
 struct Card* c1Tail = NULL;
 struct Card* c2Tail = NULL;
 struct Card* c3Tail = NULL;
@@ -34,18 +39,16 @@ struct Card* c7Tail = NULL;
 int createDeck();
 void shuffle(Card *deck, int n);
 void push(Card** headOfLink, Card** tailOfLink, Card* cardToImport);
-void createColumns();
+void createGameColumns();
 void printColumn(Card *head);
 void display();
+void deckToColumns();
 
 int main() {
     createDeck();
-    shuffle(cards,CRDS);
-    shuffle(cards,CRDS);
-    createColumns();
+    deckToColumns();
 
     display();
-    //printColumn(c4Head);
 
     char command[2] = "SW";
 
@@ -89,6 +92,7 @@ void push(Card** headOfLink, Card** tailOfLink, Card* cardToImport)
         newCard->previous = *tailOfLink;
         newCard->data[0] = cardToImport->data[0];
         newCard->data[1] = cardToImport->data[1];
+        newCard->data[2] = '\0';
         (**tailOfLink).next = newCard;
         *tailOfLink = newCard;
     } else
@@ -98,6 +102,7 @@ void push(Card** headOfLink, Card** tailOfLink, Card* cardToImport)
             (*headOfLink)->next = NULL;
             (*headOfLink)->data[0] = cardToImport->data[0];
             (*headOfLink)->data[1] = cardToImport->data[1];
+            (*headOfLink)->data[2] = '\0';
             *tailOfLink = *headOfLink;
         }
 }
@@ -135,7 +140,7 @@ void shuffle(Card *deck, int n) //Shuffles array
     }
 }
 
-void createColumns()
+void createGameColumns()
 {
     for(int i = 0; i < CRDS; i++)
     {
@@ -170,6 +175,31 @@ void createColumns()
     }
 }
 
+void deckToColumns()
+{
+    int i = 0;
+
+    while(i != CRDS) {
+
+        if(i != CRDS) push(&c1Head, &c1Tail, &cards[i]);
+        i++;
+        if(i != CRDS) push(&c2Head, &c2Tail, &cards[i]);
+        i++;
+        if(i != CRDS) push(&c3Head, &c3Tail, &cards[i]);
+        i++;
+        if(i != CRDS) push(&c4Head, &c4Tail, &cards[i]);
+        i++;
+        if(i != CRDS) push(&c5Head, &c5Tail, &cards[i]);
+        i++;
+        if(i != CRDS) push(&c6Head, &c6Tail, &cards[i]);
+        i++;
+        if(i != CRDS) push(&c7Head, &c7Tail, &cards[i]);
+        i++;
+    }
+
+}
+
+
 void makeColumnInvisible(Card* columnHead, int numOfInvisible)
 {
     Card* card = columnHead;
@@ -195,121 +225,6 @@ void printColumn(Card *head)
 
 }
 
-
-void display() {
-    Card *head1 = c1Head;
-    Card *head2 = c2Head;
-    Card *head3 = c3Head;
-    Card *head4 = c4Head;
-    Card *head5 = c5Head;
-    Card *head6 = c6Head;
-    Card *head7 = c7Head;
-
-    printf("%c%c\t%c%c\t%c%c\t%c%c\t%c%c\t%c%c\t%c%c\n",
-           head1->data[0], head1->data[1],
-           head2->data[0], head2->data[1],
-           head3->data[0], head3->data[1],
-           head4->data[0], head4->data[1],
-           head5->data[0], head5->data[1],
-           head6->data[0], head6->data[1],
-           head7->data[0], head7->data[1]);
-    head2 = head2->next;
-    head3 = head3->next;
-    head4 = head4->next;
-    head5 = head5->next;
-    head6 = head6->next;
-    head7 = head7->next;
-
-    for(int i = 1; i < 6; i++) {
-        printf("\t%c%c\t%c%c\t%c%c\t%c%c\t%c%c\t%c%c\n",
-               head2->data[0], head2->data[1],
-               head3->data[0], head3->data[1],
-               head4->data[0], head4->data[1],
-               head5->data[0], head5->data[1],
-               head6->data[0], head6->data[1],
-               head7->data[0], head7->data[1]);
-        head2 = head2->next;
-        head3 = head3->next;
-        head4 = head4->next;
-        head5 = head5->next;
-        head6 = head6->next;
-        head7 = head7->next;
-    }
-
-        printf("\t\t%c%c\t%c%c\t%c%c\t%c%c\t%c%c\n",
-               head3->data[0], head3->data[1],
-               head4->data[0], head4->data[1],
-               head5->data[0], head5->data[1],
-               head6->data[0], head6->data[1],
-               head7->data[0], head7->data[1]);
-        head4 = head4->next;
-        head5 = head5->next;
-        head6 = head6->next;
-        head7 = head7->next;
-
-    printf("\t\t\t%c%c\t%c%c\t%c%c\t%c%c\n",
-           head4->data[0], head4->data[1],
-           head5->data[0], head5->data[1],
-           head6->data[0], head6->data[1],
-           head7->data[0], head7->data[1]);
-    head5 = head5->next;
-    head6 = head6->next;
-    head7 = head7->next;
-
-    printf("\t\t\t\t%c%c\t%c%c\t%c%c\n",
-           head5->data[0], head5->data[1],
-           head6->data[0], head6->data[1],
-           head7->data[0], head7->data[1]);
-    head6 = head6->next;
-    head7 = head7->next;
-
-    printf("\t\t\t\t\t%c%c\t%c%c\n",
-           head6->data[0], head6->data[1],
-           head7->data[0], head7->data[1]);
-    head7 = head7->next;
-
-    printf("\t\t\t\t\t\t%c%c\n",
-           head7->data[0], head7->data[1]);
-
-
-
-
-
-}
-
-
-    /*
-
-    for(int i = 1; i < 11; i++) {
-        if (head1 != NULL)
-            printf("%c%c\t", head1->data[0], head1->data[1]);
-        else printf("\t");
-        if (head2 != NULL)
-            printf("%c%c\t", head2->data[0], head2->data[1]);
-        else printf("\t");
-        if (head3 != NULL)
-            printf("%c%c\t", head3->data[0], head3->data[1]);
-        else printf("\t");
-        if (head4 != NULL)
-            printf("%c%c\t", head4->data[0], head4->data[1]);
-        else printf("\t");
-        if (head5 != NULL)
-            printf("%c%c\t", head5->data[0], head5->data[1]);
-        else printf("\t");
-        if (head6 != NULL)
-            printf("%c%c\t", head6->data[0], head6->data[1]);
-        else printf("\t");
-        if (head7 != NULL)
-            printf("%c%c\n", head7->data[0], head7->data[1]);
-        head1 = head1->next;
-        head2 = head2->next;
-        head3 = head3->next;
-        head4 = head4->next;
-        head5 = head5->next;
-        head6 = head6->next;
-        head7 = head7->next;
-    }
-     */
 void quitProgram()
 {
     exit(1);
@@ -318,5 +233,71 @@ void quitProgram()
 void startPhase()
 {
     createDeck();
+}
+
+char * modifyData(Card* card)
+{
+    char* newData;
+    if(card == NULL)
+    {
+        newData = (char *) "  \0";
+    } else
+        {
+        newData = card->data;
+        }
+
+    return newData;
+}
+
+void printRow(int row)
+{
+    Card* c1 = c1Head;
+    Card* c2 = c2Head;
+    Card* c3 = c3Head;
+    Card* c4 = c4Head;
+    Card* c5 = c5Head;
+    Card* c6 = c6Head;
+    Card* c7 = c7Head;
+
+    Card* foundation;
+
+    for(int i = 0 ; i < row; i++ )
+    {
+        c1 = c1->next;
+        c2 = c2->next;
+        c3 = c3->next;
+        c4 = c4->next;
+        c5 = c5->next;
+        c6 = c6->next;
+        c7 = c7->next;
+    }
+
+    if(row == 0) foundation = f1tail;
+    if(row == 2) foundation = f2tail;
+    if(row == 4) foundation = f3tail;
+    if(row == 6) foundation = f4tail;
+
+    if(row == 0 || row == 2 || row == 4 || row == 6)
+        printf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n",modifyData(c1),modifyData(c2),modifyData(c3),modifyData(c4),modifyData(c5),modifyData(c6),modifyData(c7), modifyData(foundation));
+     else printf("%s\t%s\t%s\t%s\t%s\t%s\t%s\n",modifyData(c1),modifyData(c2),modifyData(c3),modifyData(c4),modifyData(c5),modifyData(c6),modifyData(c7));
+}
+
+void display()
+{
+    printf("c1\tc2\tc3\tc4\tc5\tc6\tc7\n\n");
+    printRow(0);
+    printRow(1);
+    printRow(2);
+    printRow(3);
+    printRow(4);
+    printRow(5);
+    printRow(6);
+    printRow(7);
+    printRow(8);
+    printRow(9);
+    printRow(10);
+    printRow(11);
+    printRow(12);
+
 }
 
