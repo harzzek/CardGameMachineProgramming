@@ -19,10 +19,12 @@ struct Bulk{
     struct Card* cTail;
 };
 
+struct Card deck[];
+
 // Node operations
 void pushBulk(char name[]);
 void popBulk();
-int pushCard(struct Bulk* toBulk, char value);
+int pushCard(struct Bulk* toBulk, char value[]);
 int popCard(struct Bulk* fromBulk);
 void initGame();
 
@@ -78,15 +80,31 @@ void initGame()
     }
 }
 
-int pushCard(struct Bulk* bulk, char value)
+int pushCard(struct Bulk* bulk, char value[])
 {
+    int boo = 0;
     if(bulk->cHead != NULL)
     {
         struct Card* newCard = malloc(sizeof(struct Card));
         newCard->next = NULL;
         newCard->previous = bulk->cTail;
-        newCard->data = value;
+        newCard->data[0] = value[0];
+        newCard->data[1] = value[1];
+        newCard->data[2] = '\0';
+        bulk->cTail->next = newCard;
+        bulk->cTail = newCard;
+        boo = 1;
+    } else {
+        bulk->cHead = malloc(sizeof(struct Card));
+        bulk->cHead->previous = NULL;
+        bulk->cHead->next = NULL;
+        bulk->cHead->data[0] = value[0];
+        bulk->cHead->data[1] = value[1];
+        bulk->cHead->data[2] = value[2];
+        bulk->cTail = bulk->cHead;
+        boo = 1;
     }
+    return boo;
 }
 
 int loadDeck()
