@@ -19,7 +19,7 @@ struct Bulk{
     struct Card* cTail;
 };
 
-struct Card deck[];
+struct Card deck[CRDS];
 
 // Node operations
 void pushBulk(char name[]);
@@ -100,7 +100,7 @@ int pushCard(struct Bulk* bulk, char value[])
         bulk->cHead->next = NULL;
         bulk->cHead->data[0] = value[0];
         bulk->cHead->data[1] = value[1];
-        bulk->cHead->data[2] = value[2];
+        bulk->cHead->data[2] = '\0';
         bulk->cTail = bulk->cHead;
         boo = 1;
     }
