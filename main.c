@@ -35,7 +35,7 @@ void moveMultipleCards(struct Bulk* fromBulk, struct Bulk* toBulk);
 int loadDeck();
 void shuffle(struct Card *deck, int n);
 void createGameColumns();
-void printColumn(struct Card *head);
+void printColumn(struct Bulk *head);
 void deckToColumns();
 
 //View
@@ -49,6 +49,10 @@ struct Bulk* bulkHead;
 struct Bulk* bulkTail;
 
 int main() {
+    initGame();
+    loadDeck();
+    createGameColumns();
+    display();
 
     return 0;
 }
@@ -135,7 +139,7 @@ void swap( struct Card *a, struct Card *b){
     *b = temp;
 }
 
-void shuffle(Card *deck, int n) //Shuffles array
+void shuffle(struct Card *deck, int n) //Shuffles array
 {
     srand(time(NULL));
 
@@ -148,63 +152,48 @@ void shuffle(Card *deck, int n) //Shuffles array
 
 void createGameColumns()
 {
-    for(int i = 0; i < CRDS; i++)
+    struct Bulk* bulk = bulkHead;
+
+    pushCard(bulk,deck[0].data);
+
+    bulk = bulk->next;
+
+    for(int i = 1; i < CRDS; i++)
     {
-        if(i < 7)
-        {
-            if(i == 0) pushCard(&c1Head, &c1Tail, &cards[i]);
-            if(i == 1) pushCard(&c2Head, &c2Tail, &cards[i]);
-            if(i == 2) pushCard(&c3Head, &c3Tail, &cards[i]);
-            if(i == 3) pushCard(&c4Head, &c4Tail, &cards[i]);
-            if(i == 4) pushCard(&c5Head, &c5Tail, &cards[i]);
-            if(i == 5) pushCard(&c6Head, &c6Tail, &cards[i]);
-            if(i == 6) pushCard(&c7Head, &c7Tail, &cards[i]);
-        } else if(i < 12)
-        {
-            pushCard(&c2Head, &c2Tail, &cards[i]);
-        } else if(i < 18)
-        {
-            pushCard(&c3Head, &c3Tail, &cards[i]);
-        } else if(i < 25)
-        {
-            pushCard(&c4Head, &c4Tail, &cards[i]);
-        } else if(i < 33)
-        {
-            pushCard(&c5Head, &c5Tail, &cards[i]);
-        } else if (i < 42)
-        {
-            pushCard(&c6Head, &c6Tail, &cards[i]);
-        } else if (i < 52)
-        {
-            pushCard(&c7Head, &c7Tail, &cards[i]);
-        }
+        if(i < 7) pushCard(bulk,deck[i].data);
+        else if(i < 14) pushCard(bulk->next, deck[i].data);
+        else if(i < 22) pushCard(bulk->next->next, deck[i].data);
+        else if(i < 31) pushCard(bulk->next->next->next, deck[i].data);
+        else if(i < 41) pushCard(bulk->next->next->next->next, deck[i].data);
+        else if(i < 52) pushCard(bulk->next->next->next->next->next, deck[i].data);
     }
 }
 
 void deckToColumns()
 {
     int i = 0;
+    struct Bulk* bulk = bulkHead;
 
     while(i != CRDS) {
 
-        pushCard(&c1Head, &c1Tail, &cards[i]);
+        pushCard(bulk, deck[i].data);
         i++;
-        if(i != CRDS) pushCard(&c2Head, &c2Tail, &cards[i]);
+        if(i != CRDS) pushCard(bulk->next, deck[i].data);
         else break;
         i++;
-        if(i != CRDS) pushCard(&c3Head, &c3Tail, &cards[i]);
+        if(i != CRDS) pushCard(bulk->next->next, deck[i].data);
         else break;
         i++;
-        if(i != CRDS) pushCard(&c4Head, &c4Tail, &cards[i]);
+        if(i != CRDS) pushCard(bulk->next->next->next, deck[i].data);
         else break;
         i++;
-        if(i != CRDS) pushCard(&c5Head, &c5Tail, &cards[i]);
+        if(i != CRDS) pushCard(bulk->next->next->next->next, deck[i].data);
         else break;
         i++;
-        if(i != CRDS) pushCard(&c6Head, &c6Tail, &cards[i]);
+        if(i != CRDS) pushCard(bulk->next->next->next->next->next, deck[i].data);
         else break;
         i++;
-        if(i != CRDS) pushCard(&c7Head, &c7Tail, &cards[i]);
+        if(i != CRDS) pushCard(bulk->next->next->next->next->next->next, deck[i].data);
         else break;
         i++;
     }
@@ -212,9 +201,9 @@ void deckToColumns()
 }
 
 
-void makeColumnInvisible(Card* columnHead, int numOfInvisible)
+void makeInvisible(struct Bulk* columnHead, int numOfInvisible)
 {
-    Card* card = columnHead;
+    struct Card* card = columnHead->cHead;
 
     for(int i = 0; i < numOfInvisible; i++)
     {
@@ -224,15 +213,18 @@ void makeColumnInvisible(Card* columnHead, int numOfInvisible)
     }
 }
 
-void printColumn(Card *head)
+void printColumn(struct Bulk *head)
 {
-    printf("%c", head->data[0]);
-    printf("%c\n", head->data[1]);
+    struct Card *card = head->cHead;
 
-    while(head->next != NULL){
-        head = head->next;
-        printf("%c", head->data[0]);
-        printf("%c\n", head->data[1]);
+    printf("%c", card->data[0]);
+    printf("%c\n",card->data[1]);
+
+
+    while(card->next != NULL){
+        card = card->next;
+        printf("%c", card->data[0]);
+        printf("%c\n", card->data[1]);
     }
 
 }
@@ -248,37 +240,74 @@ void startPhase()
 }
 
 
-void printColumnRow(Card* column, int row)
+void printColumnRow(struct Bulk* bulk, int row)
 {
-    Card* columnT = column;
+    struct Card* column = bulk->cHead;
+    int boo = 1;
 
-    for(int i = 0 ; i < row; i++ )
+    for (int i = 0; i < row; ++i) {
+        if(column->next != NULL)
+            column = column->next;
+        else{
+            boo = 0;
+            break;
+        }
+    }
+    if(boo == 1) {
+        printf("%s\t", column->data);
+    } else printf(" \t");
+}
+
+int getLenghtOfColumn(struct Bulk* bulk){
+    int count = 0;
+    struct Card* current = bulk->cHead;
+    while (current != NULL)
     {
-
-        columnT = columnT->next;
-
+        count++;
+        current = current->next;
     }
 
-    if(columnT == NULL) {
-        printf("%s\t", columnT->data);
-    } else printf()
+    return count;
+}
 
+int getBulkLenght(){
+    int count = 0;
+    struct Bulk* bulk = bulkHead;
+    while (bulk != NULL)
+    {
+        count++;
+        bulk = bulk->next;
+    }
+
+    return count;
 }
 
 void display()
 {
     printf("c1\tc2\tc3\tc4\tc5\tc6\tc7\n\n");
-    for(int i = 0; i < 13; i++) {
-        printColumnRow(c1Head, i);
-        printColumnRow(c2Head, i);
-        printColumnRow(c3Head, i);
-        printColumnRow(c4Head, i);
-        printColumnRow(c5Head, i);
-        printColumnRow(c6Head, i);
-        printColumnRow(c7Head, i);
+
+    struct Bulk* bulk = bulkHead;
+    int displaySize = 0;
+    int numOfColumns = getBulkLenght();
+
+    for(int i = 0; i < numOfColumns; i++)
+    {
+        int size = getLenghtOfColumn(bulk);
+        if(displaySize < size)
+            displaySize = size;
+        bulk = bulk->next;
+    }
+
+    for(int i = 0; i < displaySize; i++) {
+        printColumnRow(bulkHead, i);
+        printColumnRow(bulkHead->next, i);
+        printColumnRow(bulkHead->next->next, i);
+        printColumnRow(bulkHead->next->next->next, i);
+        printColumnRow(bulkTail->previous->previous, i);
+        printColumnRow(bulkTail->previous, i);
+        printColumnRow(bulkTail, i);
         printf("\n");
     }
 
 
 }
-
