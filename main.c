@@ -107,6 +107,12 @@ int pushCard(struct Bulk* bulk, char value[])
     return boo;
 }
 
+void addCard(int counter,char value, char type)
+{
+    deck[counter].data[0] = value;
+    deck[counter].data[1] = type;
+}
+
 int loadDeck()
 {
     char line[CRDS];
@@ -115,7 +121,8 @@ int loadDeck()
     int counter = 0;
     while (fgets(line, CRDS, fpointer) != NULL) {
         //printf("%c %c\n",line[0], line[1]);
-
+        addCard(counter,line[0],line[1]);
+        counter++;
     }
 
     fclose(fpointer);
