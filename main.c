@@ -4,6 +4,10 @@
 #define CRDS 52
 #include <time.h>
 
+
+/**
+ *
+ */
 struct Card{
     char data[3];
     int visible;
@@ -21,16 +25,23 @@ struct Bulk{
 
 struct Card deck[CRDS];
 
+/**
+ *
+ *
+ */
 // Node operations
 void pushBulk(char name[]);
 void popBulk();
 int pushCard(struct Bulk* toBulk, char value[]);
 int popCard(struct Bulk* fromBulk);
 void initGame();
-
 void moveCard(struct Bulk* fromBulk, struct Bulk* toBulk);
 void moveMultipleCards(struct Bulk* fromBulk, struct Bulk* toBulk);
 
+/**
+ *
+ *
+ */
 //Logic
 int loadDeck();
 void shuffle(struct Card *deck, int n);
@@ -40,6 +51,9 @@ void deckToColumns();
 void createInvisibility();
 int getBulkLenght();
 
+/**
+ *
+ */
 //View
 void display();
 void console();
@@ -64,6 +78,11 @@ int main() {
     return 0;
 }
 
+/**
+ * <p>initGame</p>
+ *
+ *
+ */
 void initGame()
 {
     bulkHead = NULL;
@@ -114,6 +133,14 @@ void initGame()
     }
 }
 
+/**
+ * <p>pushCard</p>
+ * A method for the push function on the Bulk.
+ *
+ * @param bulk a Bulk pointer
+ * @param value a String
+ * @return
+ */
 int pushCard(struct Bulk* bulk, char value[])
 {
     int boo = 0;
@@ -143,12 +170,25 @@ int pushCard(struct Bulk* bulk, char value[])
     return boo;
 }
 
+/**
+ * <p>addCard</p>
+ * A method for adding each of the 52 cards into the game
+ *
+ * @param counter a int
+ * @param value a char
+ * @param type a char
+ */
 void addCard(int counter,char value, char type)
 {
     deck[counter].data[0] = value;
     deck[counter].data[1] = type;
 }
 
+/**
+ * <p>loadDeck</p>
+ * A method for loading a text file containing the cards, into the game
+ * @return a int
+ */
 int loadDeck()
 {
     char line[CRDS];
@@ -165,12 +205,26 @@ int loadDeck()
     return 0;
 }
 
+/**
+ * <p>swap</p>
+ * A method for swapping the position of 2 cards.
+ *
+ * @param a a Card pointer
+ * @param b a Card pointer
+ */
 void swap( struct Card *a, struct Card *b){
     struct Card temp = *a;
     *a = *b;
     *b = temp;
 }
 
+/**
+ * <p>shuffle</p>
+ * A method for shuffling the deck randomly.
+ *
+ * @param deck a Card pointer
+ * @param n a int
+ */
 void shuffle(struct Card *deck, int n) //Shuffles array
 {
     srand(time(NULL));
@@ -182,6 +236,13 @@ void shuffle(struct Card *deck, int n) //Shuffles array
     }
 }
 
+/**
+ * <p>makeInvisible</p>
+ * A method for making the amount of cards, that need to be invisible, invisible.
+ *
+ * @param bulk a Bulk pointer
+ * @param numOfInvisible a int
+ */
 void makeInvisible(struct Bulk* bulk,int numOfInvisible)
 {
     struct Card* card = bulk->cHead;
@@ -194,6 +255,11 @@ void makeInvisible(struct Bulk* bulk,int numOfInvisible)
     }
 }
 
+/**
+ * <p>createInvisibility</p>
+ *
+ *
+ */
 void createInvisibility()
 {
     int bulkLength = getBulkLenght();
@@ -206,6 +272,11 @@ void createInvisibility()
     }
 }
 
+/**
+ * <p>createGameColumns</p>
+ *  A method for creating the columns and reserving space for the amount of cards, that each coulmn is going to contain.
+ *
+ */
 void createGameColumns()
 {
     struct Bulk* bulk = bulkHead;
@@ -225,6 +296,11 @@ void createGameColumns()
     }
 }
 
+/**
+ * <p>deckToColumns</p>
+ * A method for putting the cards into their columns.
+ *
+ */
 void deckToColumns()
 {
     int i = 0;
@@ -255,6 +331,12 @@ void deckToColumns()
     }
 }
 
+/**
+ * <p>printColumn</p>
+ * A method for printing out the cards in the columns.
+ *
+ * @param head a Bulk pointer
+ */
 void printColumn(struct Bulk *head)
 {
     struct Card *card = head->cHead;
@@ -271,17 +353,31 @@ void printColumn(struct Bulk *head)
 
 }
 
+/**
+ * <p>quitProgram</p>
+ * A method for closing the program.
+ *
+ */
 void quitProgram()
 {
     exit(1);
 }
 
+/**
+ * <p>startPhase</p>
+ * A method for putting the game into the STARTUP phase.
+ *
+ */
 void startPhase()
 {
     loadDeck();
 }
 
-
+/**
+ * <p>printColumnRow</p>
+ * @param bulk a Bulk pointer
+ * @param row a int object
+ */
 void printColumnRow(struct Bulk* bulk, int row)
 {
     struct Card* column = bulk->cHead;
@@ -305,6 +401,12 @@ void printColumnRow(struct Bulk* bulk, int row)
     } else printf(" \t");
 }
 
+/**
+ *<p>getLenghtOfColumn</p>
+ * A getter for the amount of cards in a column.
+ * @param bulk a Bulk pointer
+ * @return counter a int
+ */
 int getLenghtOfColumn(struct Bulk* bulk){
     int count = 0;
     struct Card* current = bulk->cHead;
@@ -317,6 +419,11 @@ int getLenghtOfColumn(struct Bulk* bulk){
     return count;
 }
 
+/**
+ * <p>getBulkLenght</p>
+ * A getter for the length of the Bulk.
+ * @return count a int
+ */
 int getBulkLenght(){
     int count = 0;
     struct Bulk* bulk = bulkHead;
@@ -329,6 +436,11 @@ int getBulkLenght(){
     return count;
 }
 
+/**
+ * <p> display </p>
+ * A method for printing out the visuals of the game.
+ *
+ */
 void display()
 {
     printf("c1\tc2\tc3\tc4\tc5\tc6\tc7\n\n");
