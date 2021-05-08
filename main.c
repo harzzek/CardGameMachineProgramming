@@ -34,15 +34,18 @@ void moveMultipleCards(struct Bulk* fromBulk, struct Bulk* toBulk);
 //Logic
 int loadDeck();
 void shuffle(struct Card *deck, int n);
-void createGameColumns();
+void loadGameColumns();
 void printColumn(struct Bulk *head);
-void deckToColumns();
-void createInvisibility();
+void loadDefaultColumns();
+void loadInvisibility();
 int getBulkLenght();
+int getLenghtOfColumn(struct Bulk* bulk);
+int gameOver();
+void startPhase();
 
 //View
 void display();
-void console();
+char* startConsole(char *lastInput, int messageBoo);
 
 /**
  * Global variables
@@ -54,12 +57,17 @@ struct Bulk* foundationhead;
 struct Bulk* foundationTail;
 
 int main() {
+    /*
     initGame();
     loadDeck();
     shuffle(deck,CRDS);
-    createGameColumns();
-    createInvisibility();
+    loadGameColumns();
+    loadInvisibility();
     display();
+    */
+    startPhase();
+
+
 
     return 0;
 }
@@ -194,7 +202,7 @@ void makeInvisible(struct Bulk* bulk,int numOfInvisible)
     }
 }
 
-void createInvisibility()
+void loadInvisibility()
 {
     int bulkLength = getBulkLenght();
     struct Bulk* bulk = bulkHead->next;
@@ -206,7 +214,37 @@ void createInvisibility()
     }
 }
 
-void createGameColumns()
+void makeAllInvisible()
+{
+    struct Bulk* bulk = bulkHead;
+    struct Card* card;
+
+    for (int i = 0; i < getBulkLenght(); ++i) {
+        card = bulk->cHead;
+        for (int j = 0; j < getLenghtOfColumn(bulk); ++j) {
+            card->visible = 0;
+            card = card->next;
+        }
+        bulk = bulk->next;
+    }
+}
+
+void makeAllVisible()
+{
+    struct Bulk* bulk = bulkHead;
+    struct Card* card;
+
+    for (int i = 0; i < getBulkLenght(); ++i) {
+        card = bulk->cHead;
+        for (int j = 0; j < getLenghtOfColumn(bulk); ++j) {
+            card->visible = 1;
+            card = card->next;
+        }
+        bulk = bulk->next;
+    }
+}
+
+void loadGameColumns()
 {
     struct Bulk* bulk = bulkHead;
 
@@ -225,8 +263,9 @@ void createGameColumns()
     }
 }
 
-void deckToColumns()
+void loadDefaultColumns()
 {
+    initGame();
     int i = 0;
     struct Bulk* bulk = bulkHead;
 
@@ -278,7 +317,43 @@ void quitProgram()
 
 void startPhase()
 {
-    loadDeck();
+    int startupPhase = 0;
+    char* input;
+    int errorMsg;
+    initGame();
+
+    while(startupPhase == 0)
+    {
+
+        display();
+
+        input = startConsole(input,errorMsg);
+
+        if(input[0] == 'L' && input[1] == 'D')
+        {
+            loadDeck();
+            loadDefaultColumns();
+            makeAllInvisible();
+            errorMsg = 1;
+        } else if(input[0] == 'S' && input[1] == 'W')
+        {
+            makeAllVisible();
+            errorMsg = 1;
+        } else if(input[0] == 'S' && input[1] == 'R')
+        {
+            shuffle(deck,CRDS);
+            loadDefaultColumns();
+            errorMsg = 1;
+        } else if(input[0] == 'Q' && input[0] == 'Q')
+        {
+            quitProgram();
+            errorMsg = 1;
+        } else if(input[0] =='P')
+        {
+            startupPhase = 1;
+            errorMsg = 1;
+        } else errorMsg = 0;
+    }
 }
 
 
@@ -327,6 +402,33 @@ int getBulkLenght(){
     }
 
     return count;
+}
+
+char* startConsole(char* lastInput, int messageBoo)
+{
+    char input[2];
+
+    printf("LAST Command: %s\n", lastInput);
+    if(messageBoo == 1)
+        printf("Message: OK\n");
+    else if(messageBoo == 0)
+        printf("Message: Error\n");
+    else printf("Message: \n");
+    printf("INPUT >\n");
+    scanf("%s",input);
+
+    char *str = malloc(3);
+
+    str[0] = input[0];
+    str[1] = input[1];
+    str[2] = '\0';
+
+    return str;
+}
+
+char* playConsole()
+{
+
 }
 
 void display()
