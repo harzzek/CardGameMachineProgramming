@@ -1,108 +1,155 @@
 #include "funktions.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #define CRDS 52
 #include <time.h>
-#include<stdbool.h>
 
-typedef struct Card{
-    char data[2];
-    bool visible;
+struct Card{
+    char data[3];
+    int visible;
     struct Card* next;
     struct Card* previous;
-} Card;
+};
 
-Card cards[CRDS];
+struct Bulk{
+    char desc[10];
+    struct Bulk* next;
+    struct Bulk* previous;
+    struct Card* cHead;
+    struct Card* cTail;
+};
 
-struct Card* c1Head = NULL;
-struct Card* c2Head = NULL;
-struct Card* c3Head = NULL;
-struct Card* c4Head = NULL;
-struct Card* c5Head = NULL;
-struct Card* c6Head = NULL;
-struct Card* c7Head = NULL;
+struct Card deck[CRDS];
 
-struct Card* c1Tail = NULL;
-struct Card* c2Tail = NULL;
-struct Card* c3Tail = NULL;
-struct Card* c4Tail = NULL;
-struct Card* c5Tail = NULL;
-struct Card* c6Tail = NULL;
-struct Card* c7Tail = NULL;
+// Node operations
+void pushBulk(char name[]);
+void popBulk();
+int pushCard(struct Bulk* toBulk, char value[]);
+int popCard(struct Bulk* fromBulk);
+void initGame();
 
-int createDeck();
-void shuffle(Card *deck, int n);
-void push(Card** headOfLink, Card** tailOfLink, Card* cardToImport);
-void createColumns();
-void printColumn(Card *head);
+void moveCard(struct Bulk* fromBulk, struct Bulk* toBulk);
+void moveMultipleCards(struct Bulk* fromBulk, struct Bulk* toBulk);
+
+//Logic
+int loadDeck();
+void shuffle(struct Card *deck, int n);
+void createGameColumns();
+void printColumn(struct Bulk *head);
+void deckToColumns();
+void createInvisibility();
+int getBulkLenght();
+
+//View
 void display();
+void console();
+
+/**
+ * Global variables
+ */
+struct Bulk* bulkHead;
+struct Bulk* bulkTail;
+
+struct Bulk* foundationhead;
+struct Bulk* foundationTail;
 
 int main() {
-    createDeck();
-    shuffle(cards,CRDS);
-    shuffle(cards,CRDS);
-    createColumns();
-
+    initGame();
+    loadDeck();
+    shuffle(deck,CRDS);
+    createGameColumns();
+    createInvisibility();
     display();
-    //printColumn(c4Head);
 
-    char command[2] = "SW";
-
-    scanf("%s",command);
-
-    switch(command[0] + command[1]){
-        case 'S'+'W':
-            printf("%c%c", command[0], command[1]);
-            break;
-        case 'L'+'D':
-            printf("%c%c", command[0], command[1]);
-            break;
-        default:
-            break;
-
-    }
-
-
-/*
-    for (int i = 0; i < CRDS; i++){
-
-        printf("%c", cards[i].data[0]);
-        printf("%c\n",cards[i].data[1]);
-    }
-    */
     return 0;
+}
+
+void initGame()
+{
+    bulkHead = NULL;
+    bulkTail = NULL;
+    for(int i = 0; i < 7; i++)
+    {
+        if(bulkHead != NULL) {
+            struct Bulk *newBulk = malloc(sizeof(struct Bulk));
+            newBulk->next = NULL;
+            newBulk->previous = bulkTail;
+            newBulk->cHead = NULL;
+            newBulk->cTail = NULL;
+            newBulk->desc[5] = "what\0";
+            bulkTail->next = newBulk;
+            bulkTail = newBulk;
+        } else {
+            bulkHead = malloc(sizeof(struct Bulk));
+            bulkHead->previous = NULL;
+            bulkHead->next = NULL;
+            bulkHead->cTail = NULL;
+            bulkHead->cHead = NULL;
+            bulkTail = bulkHead;
+        }
+
+    }
+
+    foundationhead = NULL;
+    foundationTail = NULL;
+    for(int i = 0; i < 4; i++)
+    {
+        if(foundationhead != NULL) {
+            struct Bulk *newBulk = malloc(sizeof(struct Bulk));
+            newBulk->next = NULL;
+            newBulk->previous = foundationTail;
+            newBulk->cHead = NULL;
+            newBulk->cTail = NULL;
+            newBulk->desc[5] = "what\0";
+            foundationTail->next = newBulk;
+            foundationTail = newBulk;
+        } else {
+            foundationhead = malloc(sizeof(struct Bulk));
+            foundationhead->previous = NULL;
+            foundationhead->next = NULL;
+            foundationhead->cTail = NULL;
+            foundationhead->cHead = NULL;
+            foundationTail = foundationhead;
+        }
+    }
+}
+
+int pushCard(struct Bulk* bulk, char value[])
+{
+    int boo = 0;
+    if(bulk->cHead != NULL)
+    {
+        struct Card* newCard = malloc(sizeof(struct Card));
+        newCard->next = NULL;
+        newCard->previous = bulk->cTail;
+        newCard->visible = 1;
+        newCard->data[0] = value[0];
+        newCard->data[1] = value[1];
+        newCard->data[2] = '\0';
+        bulk->cTail->next = newCard;
+        bulk->cTail = newCard;
+        boo = 1;
+    } else {
+        bulk->cHead = malloc(sizeof(struct Card));
+        bulk->cHead->previous = NULL;
+        bulk->cHead->next = NULL;
+        bulk->cHead->visible = 1;
+        bulk->cHead->data[0] = value[0];
+        bulk->cHead->data[1] = value[1];
+        bulk->cHead->data[2] = '\0';
+        bulk->cTail = bulk->cHead;
+        boo = 1;
+    }
+    return boo;
 }
 
 void addCard(int counter,char value, char type)
 {
-    cards[counter].data[0] = value;
-    cards[counter].data[1] = type;
+    deck[counter].data[0] = value;
+    deck[counter].data[1] = type;
 }
 
-void push(Card** headOfLink, Card** tailOfLink, Card* cardToImport)
-{
-    if(*headOfLink != NULL)
-    {
-        struct Card* newCard = malloc(sizeof(struct Card));
-        newCard->next = NULL;
-        newCard->previous = *tailOfLink;
-        newCard->data[0] = cardToImport->data[0];
-        newCard->data[1] = cardToImport->data[1];
-        (**tailOfLink).next = newCard;
-        *tailOfLink = newCard;
-    } else
-        {
-            *headOfLink = malloc(sizeof(struct Card));
-            (*headOfLink)->previous = NULL;
-            (*headOfLink)->next = NULL;
-            (*headOfLink)->data[0] = cardToImport->data[0];
-            (*headOfLink)->data[1] = cardToImport->data[1];
-            *tailOfLink = *headOfLink;
-        }
-}
-
-int createDeck()
+int loadDeck()
 {
     char line[CRDS];
     FILE * fpointer = fopen("..\\Cards.txt","r");
@@ -124,7 +171,7 @@ void swap( struct Card *a, struct Card *b){
     *b = temp;
 }
 
-void shuffle(Card *deck, int n) //Shuffles array
+void shuffle(struct Card *deck, int n) //Shuffles array
 {
     srand(time(NULL));
 
@@ -135,181 +182,95 @@ void shuffle(Card *deck, int n) //Shuffles array
     }
 }
 
-void createColumns()
+void makeInvisible(struct Bulk* bulk,int numOfInvisible)
 {
-    for(int i = 0; i < CRDS; i++)
-    {
-        if(i < 7)
-        {
-            if(i == 0) push(&c1Head, &c1Tail, &cards[i]);
-            if(i == 1) push(&c2Head, &c2Tail, &cards[i]);
-            if(i == 2) push(&c3Head, &c3Tail, &cards[i]);
-            if(i == 3) push(&c4Head, &c4Tail, &cards[i]);
-            if(i == 4) push(&c5Head, &c5Tail, &cards[i]);
-            if(i == 5) push(&c6Head, &c6Tail, &cards[i]);
-            if(i == 6) push(&c7Head, &c7Tail, &cards[i]);
-        } else if(i < 12)
-        {
-            push(&c2Head, &c2Tail, &cards[i]);
-        } else if(i < 18)
-        {
-            push(&c3Head, &c3Tail, &cards[i]);
-        } else if(i < 25)
-        {
-            push(&c4Head, &c4Tail, &cards[i]);
-        } else if(i < 33)
-        {
-            push(&c5Head, &c5Tail, &cards[i]);
-        } else if (i < 42)
-        {
-            push(&c6Head, &c6Tail, &cards[i]);
-        } else if (i < 52)
-        {
-            push(&c7Head, &c7Tail, &cards[i]);
-        }
-    }
-}
-
-void makeColumnInvisible(Card* columnHead, int numOfInvisible)
-{
-    Card* card = columnHead;
+    struct Card* card = bulk->cHead;
 
     for(int i = 0; i < numOfInvisible; i++)
     {
-        card->visible = false;
+        card->visible = 0;
         if(card->next != NULL) card = card->next;
         else break;
     }
 }
 
-void printColumn(Card *head)
+void createInvisibility()
 {
-    printf("%c", head->data[0]);
-    printf("%c\n", head->data[1]);
+    int bulkLength = getBulkLenght();
+    struct Bulk* bulk = bulkHead->next;
 
-    while(head->next != NULL){
-        head = head->next;
-        printf("%c", head->data[0]);
-        printf("%c\n", head->data[1]);
+    for(int i = 1; i < bulkLength; i++)
+    {
+        makeInvisible(bulk, i);
+        bulk = bulk->next;
+    }
+}
+
+void createGameColumns()
+{
+    struct Bulk* bulk = bulkHead;
+
+    pushCard(bulk,deck[0].data);
+
+    bulk = bulk->next;
+
+    for(int i = 1; i < CRDS; i++)
+    {
+        if(i < 7) pushCard(bulk,deck[i].data);
+        else if(i < 14) pushCard(bulk->next, deck[i].data);
+        else if(i < 22) pushCard(bulk->next->next, deck[i].data);
+        else if(i < 31) pushCard(bulk->next->next->next, deck[i].data);
+        else if(i < 41) pushCard(bulk->next->next->next->next, deck[i].data);
+        else if(i < 52) pushCard(bulk->next->next->next->next->next, deck[i].data);
+    }
+}
+
+void deckToColumns()
+{
+    int i = 0;
+    struct Bulk* bulk = bulkHead;
+
+    while(i != CRDS) {
+
+        pushCard(bulk, deck[i].data);
+        i++;
+        if(i != CRDS) pushCard(bulk->next, deck[i].data);
+        else break;
+        i++;
+        if(i != CRDS) pushCard(bulk->next->next, deck[i].data);
+        else break;
+        i++;
+        if(i != CRDS) pushCard(bulk->next->next->next, deck[i].data);
+        else break;
+        i++;
+        if(i != CRDS) pushCard(bulk->next->next->next->next, deck[i].data);
+        else break;
+        i++;
+        if(i != CRDS) pushCard(bulk->next->next->next->next->next, deck[i].data);
+        else break;
+        i++;
+        if(i != CRDS) pushCard(bulk->next->next->next->next->next->next, deck[i].data);
+        else break;
+        i++;
+    }
+}
+
+void printColumn(struct Bulk *head)
+{
+    struct Card *card = head->cHead;
+
+    printf("%c", card->data[0]);
+    printf("%c\n",card->data[1]);
+
+
+    while(card->next != NULL){
+        card = card->next;
+        printf("%c", card->data[0]);
+        printf("%c\n", card->data[1]);
     }
 
 }
 
-
-void display() {
-    Card *head1 = c1Head;
-    Card *head2 = c2Head;
-    Card *head3 = c3Head;
-    Card *head4 = c4Head;
-    Card *head5 = c5Head;
-    Card *head6 = c6Head;
-    Card *head7 = c7Head;
-
-    printf("%c%c\t%c%c\t%c%c\t%c%c\t%c%c\t%c%c\t%c%c\n",
-           head1->data[0], head1->data[1],
-           head2->data[0], head2->data[1],
-           head3->data[0], head3->data[1],
-           head4->data[0], head4->data[1],
-           head5->data[0], head5->data[1],
-           head6->data[0], head6->data[1],
-           head7->data[0], head7->data[1]);
-    head2 = head2->next;
-    head3 = head3->next;
-    head4 = head4->next;
-    head5 = head5->next;
-    head6 = head6->next;
-    head7 = head7->next;
-
-    for(int i = 1; i < 6; i++) {
-        printf("\t%c%c\t%c%c\t%c%c\t%c%c\t%c%c\t%c%c\n",
-               head2->data[0], head2->data[1],
-               head3->data[0], head3->data[1],
-               head4->data[0], head4->data[1],
-               head5->data[0], head5->data[1],
-               head6->data[0], head6->data[1],
-               head7->data[0], head7->data[1]);
-        head2 = head2->next;
-        head3 = head3->next;
-        head4 = head4->next;
-        head5 = head5->next;
-        head6 = head6->next;
-        head7 = head7->next;
-    }
-
-        printf("\t\t%c%c\t%c%c\t%c%c\t%c%c\t%c%c\n",
-               head3->data[0], head3->data[1],
-               head4->data[0], head4->data[1],
-               head5->data[0], head5->data[1],
-               head6->data[0], head6->data[1],
-               head7->data[0], head7->data[1]);
-        head4 = head4->next;
-        head5 = head5->next;
-        head6 = head6->next;
-        head7 = head7->next;
-
-    printf("\t\t\t%c%c\t%c%c\t%c%c\t%c%c\n",
-           head4->data[0], head4->data[1],
-           head5->data[0], head5->data[1],
-           head6->data[0], head6->data[1],
-           head7->data[0], head7->data[1]);
-    head5 = head5->next;
-    head6 = head6->next;
-    head7 = head7->next;
-
-    printf("\t\t\t\t%c%c\t%c%c\t%c%c\n",
-           head5->data[0], head5->data[1],
-           head6->data[0], head6->data[1],
-           head7->data[0], head7->data[1]);
-    head6 = head6->next;
-    head7 = head7->next;
-
-    printf("\t\t\t\t\t%c%c\t%c%c\n",
-           head6->data[0], head6->data[1],
-           head7->data[0], head7->data[1]);
-    head7 = head7->next;
-
-    printf("\t\t\t\t\t\t%c%c\n",
-           head7->data[0], head7->data[1]);
-
-
-
-
-
-}
-
-
-    /*
-
-    for(int i = 1; i < 11; i++) {
-        if (head1 != NULL)
-            printf("%c%c\t", head1->data[0], head1->data[1]);
-        else printf("\t");
-        if (head2 != NULL)
-            printf("%c%c\t", head2->data[0], head2->data[1]);
-        else printf("\t");
-        if (head3 != NULL)
-            printf("%c%c\t", head3->data[0], head3->data[1]);
-        else printf("\t");
-        if (head4 != NULL)
-            printf("%c%c\t", head4->data[0], head4->data[1]);
-        else printf("\t");
-        if (head5 != NULL)
-            printf("%c%c\t", head5->data[0], head5->data[1]);
-        else printf("\t");
-        if (head6 != NULL)
-            printf("%c%c\t", head6->data[0], head6->data[1]);
-        else printf("\t");
-        if (head7 != NULL)
-            printf("%c%c\n", head7->data[0], head7->data[1]);
-        head1 = head1->next;
-        head2 = head2->next;
-        head3 = head3->next;
-        head4 = head4->next;
-        head5 = head5->next;
-        head6 = head6->next;
-        head7 = head7->next;
-    }
-     */
 void quitProgram()
 {
     exit(1);
@@ -317,6 +278,93 @@ void quitProgram()
 
 void startPhase()
 {
-    createDeck();
+    loadDeck();
 }
 
+
+void printColumnRow(struct Bulk* bulk, int row)
+{
+    struct Card* column = bulk->cHead;
+    int nullBoo = 1;
+
+    for (int i = 0; i < row; ++i) {
+        if(column->next != NULL) {
+            column = column->next;
+
+        } else {
+            nullBoo = 0;
+            break;
+        }
+    }
+    int isVisible = column->visible;
+
+    if(nullBoo == 1) {
+        if(isVisible == 1)
+        printf("%s\t", column->data);
+        else printf("[]\t");
+    } else printf(" \t");
+}
+
+int getLenghtOfColumn(struct Bulk* bulk){
+    int count = 0;
+    struct Card* current = bulk->cHead;
+    while (current != NULL)
+    {
+        count++;
+        current = current->next;
+    }
+
+    return count;
+}
+
+int getBulkLenght(){
+    int count = 0;
+    struct Bulk* bulk = bulkHead;
+    while (bulk != NULL)
+    {
+        count++;
+        bulk = bulk->next;
+    }
+
+    return count;
+}
+
+void display()
+{
+    printf("c1\tc2\tc3\tc4\tc5\tc6\tc7\n\n");
+
+    struct Bulk* bulk = bulkHead;
+    int displaySize = 0;
+    int numOfColumns = getBulkLenght();
+
+    for(int i = 0; i < numOfColumns; i++)
+    {
+        int size = getLenghtOfColumn(bulk);
+        if(displaySize < size)
+            displaySize = size;
+        bulk = bulk->next;
+    }
+
+    struct Bulk* found = foundationhead;
+
+    for(int i = 0; i < displaySize; i++) {
+        printColumnRow(bulkHead, i);
+        printColumnRow(bulkHead->next, i);
+        printColumnRow(bulkHead->next->next, i);
+        printColumnRow(bulkHead->next->next->next, i);
+        printColumnRow(bulkTail->previous->previous, i);
+        printColumnRow(bulkTail->previous, i);
+        printColumnRow(bulkTail, i);
+
+        if(i == 0 || i == 2
+        || i == 4 || i == 6) {
+            printf("F%d ", i/2+1);
+            //printColumnRow(found, 0);
+            found = found->next;
+        }
+
+        printf("\n");
+    }
+
+
+}
