@@ -25,7 +25,7 @@ struct Card deck[CRDS];
 void pushBulk(char name[]);
 void popBulk();
 int pushCard(struct Bulk* toBulk, char value[]);
-int popCard(struct Bulk* fromBulk);
+struct Card* popCard(struct Bulk* bulk);
 void initGame();
 
 void moveCard(struct Bulk* fromBulk, struct Bulk* toBulk);
@@ -356,6 +356,14 @@ void startPhase()
     }
 }
 
+void playPhase()
+{
+    char* input;
+    int errorMsg;
+
+
+}
+
 
 void printColumnRow(struct Bulk* bulk, int row)
 {
@@ -426,7 +434,27 @@ char* startConsole(char* lastInput, int messageBoo)
     return str;
 }
 
-char* playConsole()
+struct Card* popCard(struct Bulk* bulk){
+
+    struct Card* card;
+    if(bulk->cTail != NULL)
+    {
+        if(bulk->cTail->previous != NULL)
+        {
+            bulk->cTail = bulk->cTail->previous;
+            card = bulk->cTail->next;
+            bulk->cTail->next = NULL;
+        } else {
+            card = bulk->cTail;
+            bulk->cTail = NULL;
+            bulk->cHead = NULL;
+        }
+    }
+
+    return card;
+}
+
+char* playConsole(char* lastInput, int messageBoo)
 {
 
 }
@@ -467,6 +495,4 @@ void display()
 
         printf("\n");
     }
-
-
 }
