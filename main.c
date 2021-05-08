@@ -7,6 +7,7 @@
 struct Card{
     char data[3];
     int visible;
+    int value;
     struct Card* next;
     struct Card* previous;
 };
@@ -25,11 +26,10 @@ struct Card deck[CRDS];
 void pushBulk(char name[]);
 void popBulk();
 int pushCard(struct Bulk* toBulk, char value[]);
-struct Card* popCard(struct Bulk* bulk);
+struct Card* popCard(struct Bulk* bulk, char cardValue[2]);
 void initGame();
 
-void moveCard(struct Bulk* fromBulk, struct Bulk* toBulk);
-void moveMultipleCards(struct Bulk* fromBulk, struct Bulk* toBulk);
+void moveCard(struct Card* cardToMove, struct Bulk* toBulk);
 
 //Logic
 int loadDeck();
@@ -38,10 +38,12 @@ void loadGameColumns();
 void printColumn(struct Bulk *head);
 void loadDefaultColumns();
 void loadInvisibility();
-int getBulkLenght();
-int getLenghtOfColumn(struct Bulk* bulk);
+int numberOfBulks();
+int numberOfCardsInBulk(struct Bulk* bulk);
 int gameOver();
 void startPhase();
+int giveValue(char value);
+int numberOfChars(char* string);
 
 //View
 void display();
@@ -134,6 +136,7 @@ int pushCard(struct Bulk* bulk, char value[])
         newCard->data[0] = value[0];
         newCard->data[1] = value[1];
         newCard->data[2] = '\0';
+        newCard->value = giveValue(value[0]);
         bulk->cTail->next = newCard;
         bulk->cTail = newCard;
         boo = 1;
@@ -145,6 +148,7 @@ int pushCard(struct Bulk* bulk, char value[])
         bulk->cHead->data[0] = value[0];
         bulk->cHead->data[1] = value[1];
         bulk->cHead->data[2] = '\0';
+        bulk->cHead->value = giveValue(value[0]);
         bulk->cTail = bulk->cHead;
         boo = 1;
     }
@@ -202,9 +206,9 @@ void makeInvisible(struct Bulk* bulk,int numOfInvisible)
     }
 }
 
-void loadInvisibility()
+void loadGameInvisibility()
 {
-    int bulkLength = getBulkLenght();
+    int bulkLength = numberOfBulks();
     struct Bulk* bulk = bulkHead->next;
 
     for(int i = 1; i < bulkLength; i++)
@@ -219,9 +223,9 @@ void makeAllInvisible()
     struct Bulk* bulk = bulkHead;
     struct Card* card;
 
-    for (int i = 0; i < getBulkLenght(); ++i) {
+    for (int i = 0; i < numberOfBulks(); ++i) {
         card = bulk->cHead;
-        for (int j = 0; j < getLenghtOfColumn(bulk); ++j) {
+        for (int j = 0; j < numberOfCardsInBulk(bulk); ++j) {
             card->visible = 0;
             card = card->next;
         }
@@ -234,9 +238,9 @@ void makeAllVisible()
     struct Bulk* bulk = bulkHead;
     struct Card* card;
 
-    for (int i = 0; i < getBulkLenght(); ++i) {
+    for (int i = 0; i < numberOfBulks(); ++i) {
         card = bulk->cHead;
-        for (int j = 0; j < getLenghtOfColumn(bulk); ++j) {
+        for (int j = 0; j < numberOfCardsInBulk(bulk); ++j) {
             card->visible = 1;
             card = card->next;
         }
@@ -360,10 +364,31 @@ void playPhase()
 {
     char* input;
     int errorMsg;
+    int finished;
 
+    while(finished == 0)
+    {
+
+        display();
+
+        input = startConsole(input,errorMsg);
+        int sizeOfInput = numberOfChars(input);
+
+        if(input[0] == 'Q' && input[0] == 'Q')
+        {
+            quitProgram();
+            errorMsg = 1;
+        } else if(sizeOfInput == 4)
+        {
+
+        }
+    }
 
 }
 
+void moveCard(struct Card* cardToMove, struct Bulk* toBulk){
+
+}
 
 void printColumnRow(struct Bulk* bulk, int row)
 {
@@ -388,7 +413,7 @@ void printColumnRow(struct Bulk* bulk, int row)
     } else printf(" \t");
 }
 
-int getLenghtOfColumn(struct Bulk* bulk){
+int numberOfCardsInBulk(struct Bulk* bulk){
     int count = 0;
     struct Card* current = bulk->cHead;
     while (current != NULL)
@@ -400,7 +425,7 @@ int getLenghtOfColumn(struct Bulk* bulk){
     return count;
 }
 
-int getBulkLenght(){
+int numberOfBulks(){
     int count = 0;
     struct Bulk* bulk = bulkHead;
     while (bulk != NULL)
@@ -409,6 +434,16 @@ int getBulkLenght(){
         bulk = bulk->next;
     }
 
+    return count;
+}
+
+int numberOfChars(char* string)
+{
+    int count = 0;
+    while(string[count] != NULL || string[count] != " ")
+    {
+        count++;
+    }
     return count;
 }
 
@@ -434,18 +469,53 @@ char* startConsole(char* lastInput, int messageBoo)
     return str;
 }
 
-struct Card* popCard(struct Bulk* bulk){
+char* playConsole(char* lastInput, int messageBoo)
+{
+    char input[5];
 
-    struct Card* card;
+    printf("LAST Command: %s\n", lastInput);
+    if(messageBoo == 1)
+        printf("Message: OK\n");
+    else if(messageBoo == 0)
+        printf("Message: Error\n");
+    else printf("Message: \n");
+    printf("INPUT >\n");
+    scanf("%s",input);
+
+    char *str = malloc(6);
+
+    str[0] = input[0];
+    str[1] = input[1];
+    str[2] = input[2];
+    str[3] = input[3];
+    str[4] = input[4];
+    str[5] = '\0';
+
+    return str;
+}
+
+struct Card* popCard(struct Bulk* bulk, char cardValue[2]){
+
+    struct Card* card = bulk->cHead;
+    int numberOfCards = numberOfCardsInBulk(bulk);
+
+
     if(bulk->cTail != NULL)
     {
-        if(bulk->cTail->previous != NULL)
+        for(int i = 0; i < numberOfCards; i++)
         {
-            bulk->cTail = bulk->cTail->previous;
-            card = bulk->cTail->next;
+            if(cardValue[0] == card->data[0] || cardValue[1] == card->data[1])
+            {
+                break;
+            } else card = card->next;
+        }
+
+        if(card->previous != NULL)
+        {
+            bulk->cTail = card->previous;
+            card->previous = NULL;
             bulk->cTail->next = NULL;
         } else {
-            card = bulk->cTail;
             bulk->cTail = NULL;
             bulk->cHead = NULL;
         }
@@ -454,22 +524,17 @@ struct Card* popCard(struct Bulk* bulk){
     return card;
 }
 
-char* playConsole(char* lastInput, int messageBoo)
-{
-
-}
-
 void display()
 {
     printf("c1\tc2\tc3\tc4\tc5\tc6\tc7\n\n");
 
     struct Bulk* bulk = bulkHead;
     int displaySize = 0;
-    int numOfColumns = getBulkLenght();
+    int numOfColumns = numberOfBulks();
 
     for(int i = 0; i < numOfColumns; i++)
     {
-        int size = getLenghtOfColumn(bulk);
+        int size = numberOfCardsInBulk(bulk);
         if(displaySize < size)
             displaySize = size;
         bulk = bulk->next;
@@ -494,5 +559,38 @@ void display()
         }
 
         printf("\n");
+    }
+}
+
+int giveValue(char value)
+{
+    switch(value)
+    {
+        case 'A':
+            return 1;
+        case '2':
+            return 2;
+        case '3':
+            return 3;
+        case '4':
+            return 4;
+        case '5':
+            return 5;
+        case '6':
+            return 6;
+        case '7':
+            return 7;
+        case '8':
+            return 8;
+        case '9':
+            return 9;
+        case 'T':
+            return 10;
+        case 'J':
+            return 11;
+        case 'Q':
+            return 12;
+        case 'K':
+            return 13;
     }
 }
