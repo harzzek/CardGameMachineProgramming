@@ -37,6 +37,8 @@ void shuffle(struct Card *deck, int n);
 void createGameColumns();
 void printColumn(struct Bulk *head);
 void deckToColumns();
+void createInvisibility();
+int getBulkLenght();
 
 //View
 void display();
@@ -48,10 +50,15 @@ void console();
 struct Bulk* bulkHead;
 struct Bulk* bulkTail;
 
+struct Bulk* foundationhead;
+struct Bulk* foundationTail;
+
 int main() {
     initGame();
     loadDeck();
+    shuffle(deck,CRDS);
     createGameColumns();
+    createInvisibility();
     display();
 
     return 0;
@@ -82,6 +89,29 @@ void initGame()
         }
 
     }
+
+    foundationhead = NULL;
+    foundationTail = NULL;
+    for(int i = 0; i < 4; i++)
+    {
+        if(foundationhead != NULL) {
+            struct Bulk *newBulk = malloc(sizeof(struct Bulk));
+            newBulk->next = NULL;
+            newBulk->previous = foundationTail;
+            newBulk->cHead = NULL;
+            newBulk->cTail = NULL;
+            newBulk->desc[5] = "what\0";
+            foundationTail->next = newBulk;
+            foundationTail = newBulk;
+        } else {
+            foundationhead = malloc(sizeof(struct Bulk));
+            foundationhead->previous = NULL;
+            foundationhead->next = NULL;
+            foundationhead->cTail = NULL;
+            foundationhead->cHead = NULL;
+            foundationTail = foundationhead;
+        }
+    }
 }
 
 int pushCard(struct Bulk* bulk, char value[])
@@ -92,6 +122,7 @@ int pushCard(struct Bulk* bulk, char value[])
         struct Card* newCard = malloc(sizeof(struct Card));
         newCard->next = NULL;
         newCard->previous = bulk->cTail;
+        newCard->visible = 1;
         newCard->data[0] = value[0];
         newCard->data[1] = value[1];
         newCard->data[2] = '\0';
@@ -102,6 +133,7 @@ int pushCard(struct Bulk* bulk, char value[])
         bulk->cHead = malloc(sizeof(struct Card));
         bulk->cHead->previous = NULL;
         bulk->cHead->next = NULL;
+        bulk->cHead->visible = 1;
         bulk->cHead->data[0] = value[0];
         bulk->cHead->data[1] = value[1];
         bulk->cHead->data[2] = '\0';
@@ -147,6 +179,30 @@ void shuffle(struct Card *deck, int n) //Shuffles array
     {
         int j = rand() % (i+1);
         swap(&deck[i], &deck[j]);
+    }
+}
+
+void makeInvisible(struct Bulk* bulk,int numOfInvisible)
+{
+    struct Card* card = bulk->cHead;
+
+    for(int i = 0; i < numOfInvisible; i++)
+    {
+        card->visible = 0;
+        if(card->next != NULL) card = card->next;
+        else break;
+    }
+}
+
+void createInvisibility()
+{
+    int bulkLength = getBulkLenght();
+    struct Bulk* bulk = bulkHead->next;
+
+    for(int i = 1; i < bulkLength; i++)
+    {
+        makeInvisible(bulk, i);
+        bulk = bulk->next;
     }
 }
 
@@ -197,20 +253,6 @@ void deckToColumns()
         else break;
         i++;
     }
-
-}
-
-
-void makeInvisible(struct Bulk* columnHead, int numOfInvisible)
-{
-    struct Card* card = columnHead->cHead;
-
-    for(int i = 0; i < numOfInvisible; i++)
-    {
-        card->visible = 0;
-        if(card->next != NULL) card = card->next;
-        else break;
-    }
 }
 
 void printColumn(struct Bulk *head)
@@ -243,18 +285,23 @@ void startPhase()
 void printColumnRow(struct Bulk* bulk, int row)
 {
     struct Card* column = bulk->cHead;
-    int boo = 1;
+    int nullBoo = 1;
 
     for (int i = 0; i < row; ++i) {
-        if(column->next != NULL)
+        if(column->next != NULL) {
             column = column->next;
-        else{
-            boo = 0;
+
+        } else {
+            nullBoo = 0;
             break;
         }
     }
-    if(boo == 1) {
+    int isVisible = column->visible;
+
+    if(nullBoo == 1) {
+        if(isVisible == 1)
         printf("%s\t", column->data);
+        else printf("[]\t");
     } else printf(" \t");
 }
 
@@ -298,6 +345,8 @@ void display()
         bulk = bulk->next;
     }
 
+    struct Bulk* found = foundationhead;
+
     for(int i = 0; i < displaySize; i++) {
         printColumnRow(bulkHead, i);
         printColumnRow(bulkHead->next, i);
@@ -306,6 +355,14 @@ void display()
         printColumnRow(bulkTail->previous->previous, i);
         printColumnRow(bulkTail->previous, i);
         printColumnRow(bulkTail, i);
+
+        if(i == 0 || i == 2
+        || i == 4 || i == 6) {
+            printf("F%d ", i/2+1);
+            //printColumnRow(found, 0);
+            found = found->next;
+        }
+
         printf("\n");
     }
 
