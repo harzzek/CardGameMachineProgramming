@@ -360,6 +360,7 @@ void startPhase()
     }
 }
 
+// C3:5H
 void playPhase()
 {
     char* input;
@@ -378,8 +379,21 @@ void playPhase()
         {
             quitProgram();
             errorMsg = 1;
-        } else if(sizeOfInput == 4)
+        } else if(sizeOfInput == 5)
         {
+            int columnNumber = (int) input[1];
+            struct Bulk* bulk= bulkHead;
+
+            for (int i = 0; i < columnNumber; ++i) {
+                bulk = bulk->next;
+            }
+
+            char cardvalue[3];
+            cardvalue[0] = input[3];
+            cardvalue[1] = input[4];
+            cardvalue[2] = '\0';
+
+            struct Card* card = popCard(bulk,cardvalue);
 
         }
     }
@@ -494,7 +508,7 @@ char* playConsole(char* lastInput, int messageBoo)
     return str;
 }
 
-struct Card* popCard(struct Bulk* bulk, char cardValue[2]){
+struct Card* popCard(struct Bulk* bulk, char cardValue[3]){
 
     struct Card* card = bulk->cHead;
     int numberOfCards = numberOfCardsInBulk(bulk);
