@@ -460,20 +460,23 @@ void playPhase()
                 input = startConsole(input, errorMsg);
                 columnNumber = input[1] - '0';
 
-                struct Bulk *toBulk = NULL;
+                if(input[0] != 'f' || input[0] != 'c') {
 
-                if(input[0] == 'c')
-                    toBulk = findBulk(columnNumber);
-                else toBulk = findFoundation(columnNumber);
+                    struct Bulk *toBulk = NULL;
 
-                if (canCardMove(cardToPush, toBulk)) {
-                    if (cardToPush->previous != NULL && cardToPush->previous->visible == 0) {
-                        cardToPush->previous->visible = 1;
-                    }
-                    cardToPush = popCard(fromBulk, cardToPush);
-                    pushCard(toBulk, cardToPush);
+                    if (input[0] == 'c')
+                        toBulk = findBulk(columnNumber);
+                    else toBulk = findFoundation(columnNumber);
+
+                    if (canCardMove(cardToPush, toBulk)) {
+                        if (cardToPush->previous != NULL && cardToPush->previous->visible == 0) {
+                            cardToPush->previous->visible = 1;
+                        }
+                        cardToPush = popCard(fromBulk, cardToPush);
+                        pushCard(toBulk, cardToPush);
+                    } else errorMsg = 1;
+                    free(input);
                 } else errorMsg = 1;
-                free(input);
             }
 
         } else if(input[0] == 'Q')
