@@ -695,6 +695,7 @@ void display()
     }
 
     struct Bulk* found = foundationhead;
+    int foundCardsNum;
 
     for(int i = 0; i < displaySize; i++) {
         printColumnRow(bulkHead, i);
@@ -708,7 +709,8 @@ void display()
         if(i == 0 || i == 2
         || i == 4 || i == 6) {
             printf("F%d ", i/2+1);
-            printColumnRow(found, i);
+            foundCardsNum = numberOfCardsInBulk(found)-1;
+            printColumnRow(found, foundCardsNum);
             found = found->next;
         }
 
