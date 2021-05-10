@@ -595,7 +595,7 @@ int numberOfBulks(){
 
 char* startConsole(char* lastInput, int messageBoo)
 {
-    char input[2];
+    char input[5];
 
     printf("LAST Command: %s\n", lastInput);
     if(messageBoo == 0)
