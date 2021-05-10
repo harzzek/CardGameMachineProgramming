@@ -27,6 +27,7 @@ void pushBulk(char name[]);
 int pushCardToDeck(struct Bulk* bulk, char *value);
 struct Bulk* findBulk(int column);
 struct Bulk* findFoundation(int column);
+struct Card* findTail(struct Card* card);
 struct Card* findCard(struct Bulk* bulk, char *cardValue);
 struct Card* popCard(struct Bulk* bulk, struct Card* card);
 void initGame();
@@ -157,14 +158,19 @@ int pushCard(struct Bulk* toBulk, struct Card* cardToPush){
 
     int boo = 0;
 
+    struct Card* card = cardToPush;
+
     if(toBulk->cHead != NULL)
     {
-        cardToPush->previous = toBulk->cTail;
-        toBulk->cTail->next = cardToPush;
-        toBulk->cTail = cardToPush;
+        card->previous = toBulk->cTail;
+        toBulk->cTail->next = card;
+        card = findTail(card);
+        toBulk->cTail = card;
+
     } else {
-        toBulk->cHead = cardToPush;
-        toBulk->cTail = cardToPush;
+        toBulk->cHead = card;
+        card = findTail(card);
+        toBulk->cTail = card;
     }
 
     return boo;
@@ -636,6 +642,18 @@ struct Card* findCard(struct Bulk* bulk, char *cardValue){
     }
 
     return card;
+}
+
+struct Card* findTail(struct Card* card){
+    struct Card* cardHead = card;
+
+    while(cardHead->next != NULL)
+    {
+        cardHead = cardHead->next;
+    }
+
+    return cardHead;
+
 }
 
 struct Card* popCard(struct Bulk* bulk, struct Card* card){
