@@ -439,7 +439,7 @@ void playPhase()
         {
             quitProgram();
             errorMsg = 0;
-        } else if((input[0] == 'c' || input[0] == 'f') && input[2] == ':')
+        } else if((input[0] == 'c'|| input[0] == 'C' || input[0] == 'f' || input[0] == 'F') && input[2] == ':')
         {
             // Get the input from which the card found from
             // That is bulk and card
