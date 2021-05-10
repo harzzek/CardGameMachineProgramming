@@ -682,7 +682,7 @@ void display()
 
     if(gameLoaded == 1)
     {
-        displaySize = 6;
+        displaySize = 7;
     }
 
     int size;
