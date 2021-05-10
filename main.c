@@ -464,7 +464,7 @@ void playPhase()
 
                 if(input[0] == 'c')
                     toBulk = findBulk(columnNumber);
-                else if(input[0] == 'f')toBulk = findFoundation(columnNumber);
+                else toBulk = findFoundation(columnNumber);
 
                 if (canCardMove(cardToPush, toBulk)) {
                     if (cardToPush->previous != NULL && cardToPush->previous->visible == 0) {
