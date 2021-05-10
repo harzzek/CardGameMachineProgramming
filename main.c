@@ -341,7 +341,7 @@ int canCardMove(struct Card* cardToMove, struct Bulk* toBulk){
     int canMove = 0;
     struct Card* tail = toBulk->cTail;
 
-    if(toBulk->cHead != NULL)
+    if(toBulk->cHead != NULL || toBulk == NULL)
     {
         if(toBulk->desc == 'c') {
             if (cardToMove->value+1 == tail->value && cardToMove->data[1] != tail->data[1]) {
@@ -460,10 +460,11 @@ void playPhase()
                 input = startConsole(input, errorMsg);
                 columnNumber = input[1] - '0';
 
-                struct Bulk *toBulk;
+                struct Bulk *toBulk = NULL;
+
                 if(input[0] == 'c')
                     toBulk = findBulk(columnNumber);
-                else toBulk = findFoundation(columnNumber);
+                else if(input[0] == 'f')toBulk = findFoundation(columnNumber);
 
                 if (canCardMove(cardToPush, toBulk)) {
                     if (cardToPush->previous != NULL && cardToPush->previous->visible == 0) {
