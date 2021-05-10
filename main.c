@@ -465,7 +465,6 @@ void playPhase()
                     toBulk = findBulk(columnNumber);
                 else toBulk = findFoundation(columnNumber);
 
-                //TODO Bug null pointer column
                 if (canCardMove(cardToPush, toBulk)) {
                     if (cardToPush->previous != NULL && cardToPush->previous->visible == 0) {
                         cardToPush->previous->visible = 1;
