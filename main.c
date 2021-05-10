@@ -439,7 +439,7 @@ void playPhase()
         {
             quitProgram();
             errorMsg = 0;
-        } else if((input[0] == 'c'|| input[0] == 'C' || input[0] == 'f' || input[0] == 'F') && input[2] == ':')
+        } else if((input[0] == 'c'|| input[0] == 'C') && input[2] == ':')
         {
             // Get the input from which the card found from
             // That is bulk and card
@@ -483,6 +483,35 @@ void playPhase()
         {
             initGame();
             startPhase();
+        } else if(input[0] == 'F'|| input[0] == 'f')
+        {
+            int columnNumber = input[1] - '0';
+            struct Bulk* fromBulk = findFoundation(columnNumber);
+
+            struct Card* cardToPush = findTail(fromBulk->cHead);
+
+            if(cardToPush != NULL)
+            {
+                errorMsg = 0;
+                input = startConsole(input, errorMsg);
+                columnNumber = input[1] - '0';
+
+                if(input[0] == 'c')
+                {
+                    struct Bulk *toBulk;
+                    toBulk = findBulk(columnNumber);
+
+                    if (canCardMove(cardToPush, toBulk)) {
+                        if (cardToPush->previous != NULL && cardToPush->previous->visible == 0) {
+                            cardToPush->previous->visible = 1;
+                        }
+                        cardToPush = popCard(fromBulk, cardToPush);
+                        pushCard(toBulk, cardToPush);
+                    } else errorMsg = 1;
+
+                } else errorMsg = 1;
+            } else errorMsg = 1;
+
         } else errorMsg = 1;
 
 
