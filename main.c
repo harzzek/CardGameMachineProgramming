@@ -13,7 +13,7 @@ struct Card{
 };
 
 struct Bulk{
-    char desc[12];
+    char desc;
     struct Bulk* next;
     struct Bulk* previous;
     struct Card* cHead;
@@ -24,12 +24,14 @@ struct Card deck[CRDS];
 
 // Node operations
 void pushBulk(char name[]);
-void popBulk();
 int pushCardToDeck(struct Bulk* bulk, char *value);
-struct Card* popCard(struct Bulk* bulk, char* cardValue);
+struct Bulk* findBulk(int column);
+struct Bulk* findFoundation(int column);
+struct Card* findCard(struct Bulk* bulk, char *cardValue);
+struct Card* popCard(struct Bulk* bulk, struct Card* card);
 void initGame();
 
-void moveCard(struct Card* cardToMove, struct Bulk* toBulk);
+int canCardMove(struct Card* cardToMove, struct Bulk* toBulk);
 
 //Logic
 int loadDeck();
@@ -60,19 +62,11 @@ struct Bulk* bulkTail;
 struct Bulk* foundationhead;
 struct Bulk* foundationTail;
 
+int gameLoaded;
+
 int main() {
-    /*
-    initGame();
-    loadDeck();
-    shuffle(deck,CRDS);
-    loadGameColumns();
-    loadInvisibility();
-    display();
-    */
+    gameLoaded = 0;
     startPhase();
-
-
-
     return 0;
 }
 
@@ -88,7 +82,7 @@ void initGame()
             newBulk->previous = bulkTail;
             newBulk->cHead = NULL;
             newBulk->cTail = NULL;
-            newBulk->desc[11] = "column\0";
+            newBulk->desc = 'c';
             bulkTail->next = newBulk;
             bulkTail = newBulk;
         } else {
@@ -96,6 +90,7 @@ void initGame()
             bulkHead->previous = NULL;
             bulkHead->next = NULL;
             bulkHead->cTail = NULL;
+            bulkHead->desc = 'c';
             bulkHead->cHead = NULL;
             bulkTail = bulkHead;
         }
@@ -112,7 +107,7 @@ void initGame()
             newBulk->previous = foundationTail;
             newBulk->cHead = NULL;
             newBulk->cTail = NULL;
-            newBulk->desc[11] = "foundation\0";
+            newBulk->desc = 'f';
             foundationTail->next = newBulk;
             foundationTail = newBulk;
         } else {
@@ -120,6 +115,7 @@ void initGame()
             foundationhead->previous = NULL;
             foundationhead->next = NULL;
             foundationhead->cTail = NULL;
+            foundationhead->desc = 'f';
             foundationhead->cHead = NULL;
             foundationTail = foundationhead;
         }
@@ -160,47 +156,17 @@ int pushCardToDeck(struct Bulk* bulk, char *value)
 int pushCard(struct Bulk* toBulk, struct Card* cardToPush){
 
     int boo = 0;
+
     if(toBulk->cHead != NULL)
     {
-        if(toBulk->desc[0] == 'c') {
-            int tailValue = toBulk->cTail->value;
-            if (cardToPush->value == tailValue + 1 && cardToPush->data[1] != toBulk->cTail->data[1]) {
-                cardToPush->previous = toBulk->cTail;
-                toBulk->cTail->next = cardToPush;
-                toBulk->cTail = cardToPush;
-
-                boo = 1;
-            }
-        } else
-        {
-            int tailValue = toBulk->cTail->value;
-            if (cardToPush->value + 1 == tailValue && cardToPush->data[1] == toBulk->cTail->data[1]
-            && cardToPush->next == NULL) {
-                cardToPush->previous = toBulk->cTail;
-                toBulk->cTail->next = cardToPush;
-                toBulk->cTail = cardToPush;
-
-                boo = 1;
-            }
-        }
+        cardToPush->previous = toBulk->cTail;
+        toBulk->cTail->next = cardToPush;
+        toBulk->cTail = cardToPush;
     } else {
-        if(toBulk->desc[0] == 'c') {
-            if (cardToPush->value == 13) {
-                toBulk->cHead = cardToPush;
-                toBulk->cTail = cardToPush;
-
-                boo = 1;
-            }
-        } else
-            {
-                if (cardToPush->value == 1 && cardToPush->next == NULL) {
-                    toBulk->cHead = cardToPush;
-                    toBulk->cTail = cardToPush;
-
-                    boo = 1;
-                }
-            }
+        toBulk->cHead = cardToPush;
+        toBulk->cTail = cardToPush;
     }
+
     return boo;
 
 }
@@ -365,20 +331,42 @@ void printColumn(struct Bulk *head)
 
 }
 
+int canCardMove(struct Card* cardToMove, struct Bulk* toBulk){
+    int canMove = 0;
+    struct Card* tail = toBulk->cTail;
+
+    if(toBulk->cHead != NULL)
+    {
+        if(toBulk->desc == 'c') {
+            if (cardToMove->value+1 == tail->value && cardToMove->data[1] != tail->data[1]) {
+                canMove = 1;
+            }
+        } else if(toBulk->desc == 'f')
+        {
+            if (cardToMove->value-1 == tail->value && cardToMove->data[1] == tail->data[1]
+                && cardToMove->next == NULL) {
+                canMove = 1;
+            }
+        }
+    } else {
+        if(toBulk->desc == 'c') {
+            if (cardToMove->value == 13) {
+                canMove = 1;
+            }
+        } else if(toBulk->desc == 'f')
+        {
+            if (cardToMove->value == 1 && cardToMove->next == NULL) {
+                canMove = 1;
+            }
+        }
+    }
+    return canMove;
+
+}
+
 void quitProgram()
 {
     exit(1);
-}
-
-void moveCard(struct Card* cardToMove, struct Bulk* toBulk){
-
-
-    //nextCommand contains the bulk which the card is supposed to be sent to.
-    char nextCommand[3];
-    scanf("%s",nextCommand);
-    nextCommand[2] = "\0";
-
-    pushCard(toBulk, cardToMove);
 }
 
 void startPhase()
@@ -396,32 +384,33 @@ void startPhase()
 
         if(input[0] == 'L' && input[1] == 'D')
         {
+            gameLoaded = 1;
             loadDeck();
             loadDefaultColumns();
             makeAllInvisible();
-            errorMsg = 1;
+            errorMsg = 0;
         } else if(input[0] == 'S' && input[1] == 'W')
         {
             makeAllVisible();
-            errorMsg = 1;
+            errorMsg = 0;
         } else if(input[0] == 'S' && input[1] == 'R')
         {
             shuffle(deck,CRDS);
             loadDefaultColumns();
-            errorMsg = 1;
+            errorMsg = 0;
         } else if(input[0] == 'Q' && input[0] == 'Q')
         {
             startupPhase = 1;
             quitProgram();
-            errorMsg = 1;
+            errorMsg = 0;
         } else if(input[0] =='P')
         {
-            errorMsg = 1;
+            errorMsg = 0;
             loadGameColumns();
             makeAllVisible();
             loadGameInvisibility();
             startupPhase = 1;
-        } else errorMsg = 0;
+        } else errorMsg = 1;
     }
     playPhase();
 }
@@ -443,41 +432,51 @@ void playPhase()
         if(input[0] == 'Q' && input[1] == 'Q')
         {
             quitProgram();
-            errorMsg = 1;
-        } else if(input[0] == 'c' || input[0] == 'f')
+            errorMsg = 0;
+        } else if((input[0] == 'c' || input[0] == 'f') && input[2] == ':')
         {
+            // Get the input from which the card found from
+            // That is bulk and card
             int columnNumber = input[1] - '0';
 
-            struct Bulk* bulk = bulkHead;
-
-            for(int i = 0; i < columnNumber-1;i++)
-            {
-                bulk = bulk->next;
-            }
+            struct Bulk* fromBulk = findBulk(columnNumber);
 
             char *cardvalue = malloc(3);
             cardvalue[0] = input[3];
             cardvalue[1] = input[4];
             cardvalue[2] = '\0';
 
-            struct Card* card = popCard(bulk, cardvalue);
-
+            struct Card* cardToPush = findCard(fromBulk, cardvalue);
             free(cardvalue);
-            errorMsg = 1;
-            input = playConsole(input,errorMsg);
-            columnNumber = (int) input[1];
-            bulk = bulkHead;
+            if(cardToPush != NULL) {
 
-            for (int i = 0; i < columnNumber; ++i) {
-                bulk = bulk->next;
+                errorMsg = 0;
+                input = startConsole(input, errorMsg);
+                columnNumber = input[1] - '0';
+
+                struct Bulk *toBulk;
+                if(input[0] == 'c')
+                    toBulk = findBulk(columnNumber);
+                else toBulk = findFoundation(columnNumber);
+
+                //TODO Bug null pointer column
+                if (canCardMove(cardToPush, toBulk)) {
+                    if (cardToPush->previous != NULL && cardToPush->previous->visible == 0) {
+                        cardToPush->previous->visible = 1;
+                    }
+                    cardToPush = popCard(fromBulk, cardToPush);
+                    pushCard(toBulk, cardToPush);
+                } else errorMsg = 1;
+                free(input);
             }
-
-            moveCard(card, bulk);
 
         } else if(input[0] == 'Q')
         {
+            initGame();
             startPhase();
-        }
+        } else errorMsg = 1;
+
+
 
         finished = gameOver();
     }
@@ -486,48 +485,49 @@ void playPhase()
 
 void printColumnRow(struct Bulk* bulk, int row)
 {
-    struct Card* column = bulk->cHead;
-    int nullBoo = 1;
+    if(bulk->cHead != NULL) {
+        struct Card *card = bulk->cHead;
+        int nullBoo = 1;
 
-    for (int i = 0; i < row; ++i) {
-        if(column->next != NULL) {
-            column = column->next;
+        for (int i = 0; i < row; ++i) {
+            if (card->next != NULL) {
+                card = card->next;
 
-        } else {
-            nullBoo = 0;
-            break;
+            } else {
+                nullBoo = 0;
+                break;
+            }
         }
-    }
-    int isVisible = column->visible;
+        int isVisible = card->visible;
 
-    if(nullBoo == 1) {
-        if(isVisible == 1)
-        printf("%s\t", column->data);
-        else printf("[]\t");
+        if (nullBoo == 1) {
+            if (isVisible == 1)
+                printf("%s\t", card->data);
+            else printf("[]\t");
+        } else printf(" \t");
     } else printf(" \t");
 }
 
 int gameOver()
 {
     int gameOver = 0;
-    int numOfFoundations = 0;
-    struct Bulk* bulk = foundationhead;
+    int counter = 0;
 
-    while (bulk != NULL)
-    {
-        numOfFoundations++;
-        bulk = bulk->next;
-    }
+    if(foundationhead->cHead != NULL) {
+        struct Bulk *foundation = foundationhead;
 
-    for(int i = 0; i < numOfFoundations; i++)
-    {
-        if(bulk->cTail->value == 13)
-        {
+        for (int i = 0; i < 4; i++) {
+            if (foundation->cTail->value == 13)
+            {
+                counter++;
+                foundation = foundation->next;
+            }
+        }
+
+        if(counter == 4){
             gameOver = 1;
-            break;
         }
     }
-
     return gameOver;
 }
 
@@ -560,12 +560,12 @@ char* startConsole(char* lastInput, int messageBoo)
     char input[2];
 
     printf("LAST Command: %s\n", lastInput);
-    if(messageBoo == 1)
+    if(messageBoo == 0)
         printf("Message: OK\n");
-    else if(messageBoo == 0)
+    else if(messageBoo == 1)
         printf("Message: Error\n");
     else printf("Message: \n");
-    printf("INPUT >\n");
+    printf("INPUT > ");
     scanf("%s",input);
 
     char *str = malloc(3);
@@ -582,12 +582,12 @@ char* playConsole(char* lastInput, int messageBoo)
     char input[5];
 
     printf("LAST Command: %s\n", lastInput);
-    if(messageBoo == 1)
+    if(messageBoo == 0)
         printf("Message: OK\n");
-    else if(messageBoo == 0)
+    else if(messageBoo == 1)
         printf("Message: Error\n");
     else printf("Message: \n");
-    printf("INPUT >\n");
+    printf("INPUT > ");
     scanf("%s",input);
 
     char *str = malloc(6);
@@ -602,8 +602,27 @@ char* playConsole(char* lastInput, int messageBoo)
     return str;
 }
 
-struct Card* popCard(struct Bulk* bulk, char *cardValue){
+struct Bulk* findBulk(int column){
+    struct Bulk* bulk = bulkHead;
 
+    for (int i = 0; i < column-1; ++i) {
+        bulk = bulk->next;
+    }
+
+    return bulk;
+}
+
+struct Bulk* findFoundation(int column){
+    struct Bulk* bulk = foundationhead;
+
+    for (int i = 0; i < column-1; ++i) {
+        bulk = bulk->next;
+    }
+
+    return bulk;
+}
+
+struct Card* findCard(struct Bulk* bulk, char *cardValue){
     struct Card* card = bulk->cHead;
     int numberOfCards = numberOfCardsInBulk(bulk);
     char* cardValues = cardValue;
@@ -616,6 +635,12 @@ struct Card* popCard(struct Bulk* bulk, char *cardValue){
         } else card = card->next;
     }
 
+    return card;
+}
+
+struct Card* popCard(struct Bulk* bulk, struct Card* card){
+
+    //The actual pop
     if(card->previous != NULL)
     {
         bulk->cTail = card->previous;
@@ -637,9 +662,15 @@ void display()
     int displaySize = 0;
     int numOfColumns = numberOfBulks();
 
+    if(gameLoaded == 1)
+    {
+        displaySize = 6;
+    }
+
+    int size;
     for(int i = 0; i < numOfColumns; i++)
     {
-        int size = numberOfCardsInBulk(bulk);
+        size = numberOfCardsInBulk(bulk);
         if(displaySize < size)
             displaySize = size;
         bulk = bulk->next;
@@ -659,12 +690,13 @@ void display()
         if(i == 0 || i == 2
         || i == 4 || i == 6) {
             printf("F%d ", i/2+1);
-            //printColumnRow(found, 0);
+            printColumnRow(found, i);
             found = found->next;
         }
 
         printf("\n");
     }
+
 }
 
 int giveValue(char value)
