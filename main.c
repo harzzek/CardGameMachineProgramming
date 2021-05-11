@@ -19,10 +19,12 @@ struct Bulk{
     struct Card* cHead;
     struct Card* cTail;
 };
-
 struct Card deck[CRDS];
 
-// Node operations
+/**
+ * Methods for Node operations
+ */
+
 void pushBulk(char name[]);
 int pushCardToDeck(struct Bulk* bulk, char *value);
 struct Bulk* findBulk(int column);
@@ -31,10 +33,11 @@ struct Card* findTail(struct Card* card);
 struct Card* findCard(struct Bulk* bulk, char *cardValue);
 struct Card* popCard(struct Bulk* bulk, struct Card* card);
 void initGame();
-
 int canCardMove(struct Card* cardToMove, struct Bulk* toBulk);
 
-//Logic
+/**
+ * Methods for the logic of the game
+ */
 int loadDeck();
 void shuffle(struct Card *deck, int n);
 void loadGameColumns();
@@ -49,6 +52,9 @@ void playPhase();
 int giveValue(char value);
 int numberOfChars(char* string);
 
+/**
+ * Methods for creating the view
+ */
 //View
 char* playConsole(char* lastInput, int messageBoo);
 void display();
@@ -65,11 +71,18 @@ struct Bulk* foundationTail;
 
 int gameLoaded;
 
+/**
+ * The main method
+ */
 int main() {
     gameLoaded = 0;
     startPhase();
     return 0;
 }
+
+/**
+ * A method for initializing all the global variables
+ */
 
 void initGame()
 {
@@ -123,6 +136,13 @@ void initGame()
     }
 }
 
+/**
+ * A push operation for pushing a card to the top of the bulk
+ * @param bulk a Bulk pointer
+ * @param value a char
+ * @return boo
+ */
+
 int pushCardToDeck(struct Bulk* bulk, char *value)
 {
     int boo = 0;
@@ -154,6 +174,13 @@ int pushCardToDeck(struct Bulk* bulk, char *value)
     return boo;
 }
 
+/**
+ * A push operation for a card
+ * @param toBulk a Bulk pointer
+ * @param cardToPush a Card pointer
+ * @return boo
+ */
+
 int pushCard(struct Bulk* toBulk, struct Card* cardToPush){
 
     int boo = 0;
@@ -177,12 +204,22 @@ int pushCard(struct Bulk* toBulk, struct Card* cardToPush){
 
 }
 
+/**
+ * A method that contains the second and first char of a card
+ * @param counter a int
+ * @param value a char
+ * @param type
+ */
+
 void addCard(int counter,char value, char type)
 {
     deck[counter].data[0] = value;
     deck[counter].data[1] = type;
 }
 
+/**
+ * A method for loading the Cards.txt file into the game
+ */
 int loadDeck()
 {
     char line[CRDS];
@@ -199,11 +236,23 @@ int loadDeck()
     return 0;
 }
 
+/**
+ * A method for swapping positions of two cards in the deck
+ * @param a a Card pointer
+ * @param b a Card pointer
+ */
+
 void swap( struct Card *a, struct Card *b){
     struct Card temp = *a;
     *a = *b;
     *b = temp;
 }
+
+/**
+ * A method for shuffling the deck randomly
+ * @param deck a Card pointer
+ * @param n a int
+ */
 
 void shuffle(struct Card *deck, int n) //Shuffles array
 {
@@ -215,6 +264,12 @@ void shuffle(struct Card *deck, int n) //Shuffles array
         swap(&deck[i], &deck[j]);
     }
 }
+
+/**
+ * A method for making the amount of cards that need to be invisible, invisible
+ * @param bulk a Bulk pointer
+ * @param numOfInvisible a int
+ */
 
 void makeInvisible(struct Bulk* bulk,int numOfInvisible)
 {
@@ -228,6 +283,10 @@ void makeInvisible(struct Bulk* bulk,int numOfInvisible)
     }
 }
 
+/**
+ *
+ */
+
 void loadGameInvisibility()
 {
     int bulkLength = numberOfBulks();
@@ -239,6 +298,10 @@ void loadGameInvisibility()
         bulk = bulk->next;
     }
 }
+
+/**
+ * A method for making all cards invisible
+ */
 
 void makeAllInvisible()
 {
@@ -255,6 +318,10 @@ void makeAllInvisible()
     }
 }
 
+/**
+ * A method for showing all cards in the deck
+ */
+
 void makeAllVisible()
 {
     struct Bulk* bulk = bulkHead;
@@ -269,6 +336,10 @@ void makeAllVisible()
         bulk = bulk->next;
     }
 }
+
+/**
+ * A method for loading in columns in the PLAY phase
+ */
 
 void loadGameColumns()
 {
@@ -289,6 +360,10 @@ void loadGameColumns()
         else if(i < 52) pushCardToDeck(bulk->next->next->next->next->next, deck[i].data);
     }
 }
+
+/**
+ * A method for loading in the columns in the STARTUP phase
+ */
 
 void loadDefaultColumns()
 {
@@ -321,6 +396,11 @@ void loadDefaultColumns()
     }
 }
 
+/**
+ * A method for printing out a column
+ * @param head a bulk pointer
+ */
+
 void printColumn(struct Bulk *head)
 {
     struct Card *card = head->cHead;
@@ -336,6 +416,13 @@ void printColumn(struct Bulk *head)
     }
 
 }
+
+/**
+ * A method for determining whether a move is possible to make
+ * @param cardToMove a Card pointer
+ * @param toBulk a Bulk pointer
+ * @return canMove a int
+ */
 
 int canCardMove(struct Card* cardToMove, struct Bulk* toBulk){
     int canMove = 0;
@@ -370,10 +457,18 @@ int canCardMove(struct Card* cardToMove, struct Bulk* toBulk){
 
 }
 
+/**
+ * A method for exiting the program
+ */
+
 void quitProgram()
 {
     exit(1);
 }
+
+/**
+ * A method for commands are possible in the STARTUP phase
+ */
 
 void startPhase()
 {
@@ -422,6 +517,9 @@ void startPhase()
 }
 
 // C3:5H
+/**
+ * A method for what commands are possible in the PLAY phase.
+ */
 void playPhase()
 {
     char* input;
@@ -488,6 +586,12 @@ void playPhase()
 
 }
 
+/**
+ * A method for printing each row.
+ * @param bulk a Bulk pointer
+ * @param row a int
+ */
+
 void printColumnRow(struct Bulk* bulk, int row)
 {
     if(bulk->cHead != NULL) {
@@ -513,6 +617,11 @@ void printColumnRow(struct Bulk* bulk, int row)
     } else printf(" \t");
 }
 
+/**
+ * A method for determining if the player has won
+ * @return gameOver a int
+ */
+
 int gameOver()
 {
     int gameOver = 0;
@@ -536,6 +645,12 @@ int gameOver()
     return gameOver;
 }
 
+/**
+ * A method for the amount of cards in the Bulk
+ * @param bulk a Bulk pointer
+ * @return count a int
+ */
+
 int numberOfCardsInBulk(struct Bulk* bulk){
     int count = 0;
     struct Card* current = bulk->cHead;
@@ -548,6 +663,11 @@ int numberOfCardsInBulk(struct Bulk* bulk){
     return count;
 }
 
+/**
+ * A method that contains the amount of Bulks
+ * @return count a int
+ */
+
 int numberOfBulks(){
     int count = 0;
     struct Bulk* bulk = bulkHead;
@@ -559,6 +679,13 @@ int numberOfBulks(){
 
     return count;
 }
+
+/**
+ * A method for the last input, and the message in the console in the STARTUP phase
+ * @param lastInput a char pointer
+ * @param messageBoo a int
+ * @return str a char pointer
+ */
 
 char* startConsole(char* lastInput, int messageBoo)
 {
@@ -581,6 +708,13 @@ char* startConsole(char* lastInput, int messageBoo)
 
     return str;
 }
+
+/**
+ * A method for the last input, and the message in the console in the PLAY phase
+ * @param lastInput a char pointer
+ * @param messageBoo a int
+ * @return str a char pointer
+ */
 
 char* playConsole(char* lastInput, int messageBoo)
 {
@@ -607,6 +741,12 @@ char* playConsole(char* lastInput, int messageBoo)
     return str;
 }
 
+/**
+ * A find method for Bulk
+ * @param column a int
+ * @return bulk a Bulk pointer.
+ */
+
 struct Bulk* findBulk(int column){
     struct Bulk* bulk = bulkHead;
 
@@ -617,6 +757,12 @@ struct Bulk* findBulk(int column){
     return bulk;
 }
 
+/**
+ * A find method for the foundations
+ * @param column a int
+ * @return bulk a Bulk pointer
+ */
+
 struct Bulk* findFoundation(int column){
     struct Bulk* bulk = foundationhead;
 
@@ -626,6 +772,13 @@ struct Bulk* findFoundation(int column){
 
     return bulk;
 }
+
+/**
+ * A find method for cards
+ * @param bulk a Bulk pointer
+ * @param cardValue a char pointer
+ * @return card a Card pointer
+ */
 
 struct Card* findCard(struct Bulk* bulk, char *cardValue){
     struct Card* card = bulk->cHead;
@@ -643,6 +796,12 @@ struct Card* findCard(struct Bulk* bulk, char *cardValue){
     return card;
 }
 
+/**
+ * A find method for the tail of a card
+ * @param card a Card pointer
+ * @return cardHead a Card pointer
+ */
+
 struct Card* findTail(struct Card* card){
     struct Card* cardHead = card;
 
@@ -654,6 +813,13 @@ struct Card* findTail(struct Card* card){
     return cardHead;
 
 }
+
+/**
+ * A pop operation for the removing the top card in the deck
+ * @param bulk a Bulk pointer
+ * @param card a Card pointer
+ * @return card a Card pointer
+ */
 
 struct Card* popCard(struct Bulk* bulk, struct Card* card){
 
@@ -670,6 +836,10 @@ struct Card* popCard(struct Bulk* bulk, struct Card* card){
 
     return card;
 }
+
+/**
+ * A method that controls how the cards are displayed in the console
+ */
 
 void display()
 {
@@ -717,6 +887,12 @@ void display()
     }
 
 }
+
+/**
+ * A method that gives each gives each card value a int value from 1 to 13.
+ * @param value a char
+ * @return value a char
+ */
 
 int giveValue(char value)
 {
